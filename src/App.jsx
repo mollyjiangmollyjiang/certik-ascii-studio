@@ -26,7 +26,6 @@ export default function App() {
   const [charsetKey, setCharsetKey] = useState('BLOCKS');
   const [customCharset, setCustomCharset] = useState('');
   const [invert, setInvert] = useState(false);
-  const [previewSize, setPreviewSize] = useState(12);
   const [foreground, setForeground] = useState('#F5F5F0');
   const [background, setBackground] = useState('#0A0B0D');
   const [ascii, setAscii] = useState('');
@@ -173,8 +172,6 @@ export default function App() {
             isAnimating={isAnimating}
             mode={mode}
             filename={filename}
-            previewSize={previewSize}
-            setPreviewSize={setPreviewSize}
             foreground={foreground}
             background={background}
           />
