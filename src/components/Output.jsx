@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Copy, Download, Check, FileText } from 'lucide-react';
 
+const MONO_STACK = '"JetBrains Mono", "Cascadia Code", "Fira Code", "SF Mono", "Menlo", "Consolas", "DejaVu Sans Mono", "Noto Sans Mono", monospace';
+
 export default function Output({
   theme,
   ascii,
@@ -8,8 +10,6 @@ export default function Output({
   isAnimating,
   mode,
   filename,
-  previewSize,
-  setPreviewSize,
   foreground,
   background,
 }) {
@@ -43,7 +43,7 @@ export default function Output({
     const lineHeight = fontSize * 1.15;
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    ctx.font = `500 ${fontSize}px "JetBrains Mono", monospace`;
+    ctx.font = `500 ${fontSize}px ${MONO_STACK}`;
     const charWidth = ctx.measureText('M').width;
     const maxLen = Math.max(...lines.map(l => l.length));
     const pad = 56;
@@ -54,7 +54,7 @@ export default function Output({
     ctx.fillStyle = background;
     ctx.fillRect(0, 0, w, h);
     ctx.fillStyle = foreground;
-    ctx.font = `500 ${fontSize}px "JetBrains Mono", monospace`;
+    ctx.font = `500 ${fontSize}px ${MONO_STACK}`;
     ctx.textBaseline = 'top';
     lines.forEach((line, i) => ctx.fillText(line, pad, pad + i * lineHeight));
     const a = document.createElement('a');
@@ -64,12 +64,12 @@ export default function Output({
   };
 
   return (
-    <section className="flex flex-col" style={{ background: INK, minHeight: 600 }}>
+    <section className="flex flex-col min-h-[600px] md:min-h-0" style={{ background: INK }}>
       <div
-        className="flex items-center justify-between px-5 py-3"
+        className="flex items-center justify-between gap-4 px-5 py-3"
         style={{ borderBottom: `1px solid ${HAIR}`, background: DEEP }}
       >
-        <div className="flex items-center gap-4 text-[10px] tracking-[0.18em]" style={{ color: MUTED }}>
+        <div className="flex items-center gap-4 text-[10px] tracking-[0.18em] flex-wrap" style={{ color: MUTED }}>
           <span className="font-semibold" style={{ color: TYPE }}>OUTPUT</span>
           <span>//</span>
           <span>GRID {colCount}×{lineCount}</span>
@@ -78,17 +78,19 @@ export default function Output({
           {isAnimating && (<><span>//</span><span style={{ color: BLUE }}>SCANNING...</span></>)}
         </div>
 
-        <div className="flex items-center gap-2 text-[10px] tracking-[0.18em]" style={{ color: MUTED }}>
-          ZOOM
-          <input
-            type="range"
-            min={6}
-            max={20}
-            value={previewSize}
-            onChange={(e) => setPreviewSize(+e.target.value)}
-            className="w-20"
-            style={{ accentColor: BLUE }}
-          />
+        <div className="flex items-stretch flex-shrink-0" style={{ border: `1px solid ${HAIR}` }}>
+          <ExportButton onClick={handleCopy} disabled={!ascii} type={TYPE} hair={HAIR}>
+            {copied ? <Check size={11} strokeWidth={2.5} /> : <Copy size={11} strokeWidth={2.5} />}
+            <span>{copied ? 'COPIED' : 'COPY'}</span>
+          </ExportButton>
+          <ExportButton onClick={handleDownloadTxt} disabled={!ascii} type={TYPE} hair={HAIR} borderLeft>
+            <FileText size={11} strokeWidth={2.5} />
+            <span>.TXT</span>
+          </ExportButton>
+          <ExportButton onClick={handleDownloadPng} disabled={!ascii} type={TYPE} hair={HAIR} borderLeft primary blue={BLUE}>
+            <Download size={11} strokeWidth={2.5} />
+            <span>.PNG</span>
+          </ExportButton>
         </div>
       </div>
 
@@ -102,8 +104,8 @@ export default function Output({
         {displayed ? (
           <pre
             style={{
-              fontFamily: '"JetBrains Mono", monospace',
-              fontSize: `${previewSize}px`,
+              fontFamily: MONO_STACK,
+              fontSize: '12px',
               lineHeight: 1.08,
               color: foreground,
               whiteSpace: 'pre',
@@ -127,21 +129,6 @@ export default function Output({
           </div>
         )}
       </div>
-
-      <div className="flex items-stretch" style={{ borderTop: `1px solid ${HAIR}`, background: DEEP }}>
-        <ExportButton onClick={handleCopy} disabled={!ascii} type={TYPE} hair={HAIR}>
-          {copied ? <Check size={13} strokeWidth={2.5} /> : <Copy size={13} strokeWidth={2.5} />}
-          <span>{copied ? 'COPIED' : 'COPY'}</span>
-        </ExportButton>
-        <ExportButton onClick={handleDownloadTxt} disabled={!ascii} type={TYPE} hair={HAIR} borderLeft>
-          <FileText size={13} strokeWidth={2.5} />
-          <span>EXPORT .TXT</span>
-        </ExportButton>
-        <ExportButton onClick={handleDownloadPng} disabled={!ascii} type={TYPE} hair={HAIR} borderLeft primary blue={BLUE}>
-          <Download size={13} strokeWidth={2.5} />
-          <span>EXPORT .PNG</span>
-        </ExportButton>
-      </div>
     </section>
   );
 }
@@ -157,9 +144,8 @@ function ExportButton({ onClick, disabled, children, type, hair, borderLeft, pri
         borderLeft: borderLeft ? `1px solid ${hair}` : 'none',
         opacity: disabled && !primary ? 0.35 : 1,
         cursor: disabled ? 'not-allowed' : 'pointer',
-        flex: primary ? 1.3 : 1,
       }}
-      className={`flex items-center justify-center gap-2 py-4 text-[10.5px] tracking-[0.18em] font-semibold transition-all ${primary && !disabled ? 'hover:brightness-110' : 'hover:bg-white/5'}`}
+      className={`flex items-center justify-center gap-1.5 px-3 py-1.5 text-[10px] tracking-[0.16em] font-semibold transition-all ${primary && !disabled ? 'hover:brightness-110' : 'hover:bg-white/5'}`}
     >
       {children}
     </button>

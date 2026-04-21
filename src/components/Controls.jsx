@@ -42,7 +42,7 @@ export default function Controls({
   };
 
   return (
-    <aside className="p-5 md:p-6" style={{ borderRight: `1px solid ${HAIR}`, background: DEEP }}>
+    <aside className="p-5 md:p-6 md:h-full md:overflow-y-auto" style={{ borderRight: `1px solid ${HAIR}`, background: DEEP }}>
       <Section label="01 // MODE" muted={MUTED}>
         <div className="grid grid-cols-2 gap-0" style={{ border: `1px solid ${HAIR}` }}>
           <Toggle active={mode === 'text'} onClick={() => setMode('text')} ink={INK} type={TYPE} hair={HAIR}>
@@ -75,7 +75,7 @@ export default function Controls({
             </div>
             <div className="mt-3">
               <div className="text-[10px] tracking-[0.2em] mb-2" style={{ color: MUTED }}>STYLE</div>
-              <div className="grid grid-cols-2 gap-0" style={{ border: `1px solid ${HAIR}` }}>
+              <div className="grid grid-cols-4 gap-0" style={{ border: `1px solid ${HAIR}` }}>
                 {TEXT_STYLES.map((s, i) => (
                   <button
                     key={s.key}
@@ -83,10 +83,9 @@ export default function Controls({
                     style={{
                       background: textStyle === s.key ? TYPE : 'transparent',
                       color: textStyle === s.key ? INK : TYPE,
-                      borderRight: i % 2 === 0 ? `1px solid ${HAIR}` : 'none',
-                      borderTop: i >= 2 ? `1px solid ${HAIR}` : 'none',
+                      borderRight: i < TEXT_STYLES.length - 1 ? `1px solid ${HAIR}` : 'none',
                     }}
-                    className="px-3 py-2.5 text-[10px] tracking-[0.16em] font-semibold transition-colors hover:bg-white/5"
+                    className="px-2 py-2.5 text-[10px] tracking-[0.16em] font-semibold transition-colors hover:bg-white/5"
                   >
                     {s.label}
                   </button>
@@ -139,45 +138,7 @@ export default function Controls({
         )}
       </Section>
 
-      <Section label={`03 // GRID · ${cols}×${rows}`} muted={MUTED}>
-        <div>
-          <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: MUTED }}>
-            <span>COLS</span><span style={{ color: TYPE }}>{cols}</span>
-          </div>
-          <input
-            type="range"
-            min={20}
-            max={160}
-            value={cols}
-            onChange={(e) => setCols(+e.target.value)}
-            className="w-full"
-            style={{ accentColor: BLUE }}
-          />
-          <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
-            <span>20</span><span>80</span><span>160</span>
-          </div>
-        </div>
-
-        <div className="mt-3">
-          <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: MUTED }}>
-            <span>ROWS</span><span style={{ color: TYPE }}>{rows}</span>
-          </div>
-          <input
-            type="range"
-            min={20}
-            max={120}
-            value={rows}
-            onChange={(e) => setRows(+e.target.value)}
-            className="w-full"
-            style={{ accentColor: BLUE }}
-          />
-          <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
-            <span>20</span><span>70</span><span>120</span>
-          </div>
-        </div>
-      </Section>
-
-      <Section label="04 // CHARSET" muted={MUTED}>
+      <Section label="03 // CHARSET" muted={MUTED}>
         <div className="grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
           {CHARSET_KEYS.map((k, i) => (
             <button
@@ -212,7 +173,41 @@ export default function Controls({
         </div>
       </Section>
 
-      <Section label="05 // OPTIONS" muted={MUTED}>
+      <Section label="04 // COLORS" muted={MUTED}>
+        <div className="grid grid-cols-2 gap-2">
+          <ColorField label="FG" value={foreground} onChange={setForeground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
+          <ColorField label="BG" value={background} onChange={setBackground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
+        </div>
+      </Section>
+
+      <Section label="05 // GRID" muted={MUTED}>
+        <div className="flex items-center justify-between text-[10px] tracking-[0.18em]" style={{ color: MUTED }}>
+          <span>COLS</span><span style={{ color: TYPE }}>{cols}</span>
+        </div>
+        <input
+          type="range"
+          min={20}
+          max={160}
+          value={cols}
+          onChange={(e) => setCols(+e.target.value)}
+          className="w-full mt-1"
+          style={{ accentColor: BLUE }}
+        />
+        <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mt-2" style={{ color: MUTED }}>
+          <span>ROWS</span><span style={{ color: TYPE }}>{rows}</span>
+        </div>
+        <input
+          type="range"
+          min={20}
+          max={120}
+          value={rows}
+          onChange={(e) => setRows(+e.target.value)}
+          className="w-full mt-1"
+          style={{ accentColor: BLUE }}
+        />
+      </Section>
+
+      <Section label="06 // OPTIONS" muted={MUTED}>
         <label className="flex items-center gap-3 cursor-pointer select-none">
           <div
             style={{
@@ -229,17 +224,6 @@ export default function Controls({
         </label>
       </Section>
 
-      <Section label="06 // COLORS" muted={MUTED}>
-        <div className="grid grid-cols-2 gap-2">
-          <ColorField label="FG" value={foreground} onChange={setForeground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
-          <ColorField label="BG" value={background} onChange={setBackground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
-        </div>
-      </Section>
-
-      <div className="mt-8 pt-4 text-[10px] leading-[1.7] tracking-[0.08em]" style={{ borderTop: `1px solid ${HAIR}`, color: MUTED }}>
-        <span style={{ color: BLUE }}>※</span> FOR LOGOS, TRY BLOCKS @ W:60–100.<br/>
-        <span style={{ color: BLUE }}>※</span> FOR READMES, GRADIENT @ W:80.
-      </div>
     </aside>
   );
 }

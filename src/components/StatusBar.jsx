@@ -9,18 +9,24 @@ export function TopStatusBar({ theme, isAnimating, charsetKey, cols, rows }) {
       className="flex items-center justify-between text-[10px] tracking-[0.22em] mb-4 px-4 py-2.5"
       style={{ background: DEEP, border: `1px solid ${HAIR}`, color: MUTED }}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
+        <span style={{ color: BLUE }}>◆</span>
+        <span>CERTIK</span>
+        <span className="hidden sm:inline">//</span>
+        <span className="hidden sm:inline">INTERNAL BRANDING ENGINE</span>
+        <span>//</span>
         <span
           style={{
             width: 8, height: 8, borderRadius: '50%',
             background: isAnimating ? BLUE : '#22C55E',
             boxShadow: `0 0 10px ${isAnimating ? BLUE : '#22C55E'}`,
             animation: 'pulse 1.6s ease-in-out infinite',
+            flexShrink: 0,
           }}
         />
         <span style={{ color: TYPE }}>{isAnimating ? 'RESOLVING' : 'READY'}</span>
         <span>//</span>
-        <span>CERTIK ASCII-CONV / v1.0</span>
+        <span>ASCII-CONV v1.0</span>
       </div>
       <div className="hidden md:flex items-center gap-3">
         <span>CHARSET:{charsetKey}</span>
