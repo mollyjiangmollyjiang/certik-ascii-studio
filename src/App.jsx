@@ -147,39 +147,25 @@ export default function App() {
           rows={rows}
         />
 
-        <header className="mb-5 flex items-end justify-between gap-6">
-          <div>
-            <div className="text-[10px] tracking-[0.28em] mb-3 flex items-center gap-2" style={{ color: THEME.MUTED }}>
-              <span style={{ color: THEME.BLUE }}>◆</span>
-              <span>CERTIK // INTERNAL BRANDING ENGINE</span>
-            </div>
-            <h1
-              className="leading-[0.9]"
-              style={{
-                fontFamily: '"JetBrains Mono", monospace',
-                fontWeight: 800,
-                fontSize: 'clamp(44px, 6.5vw, 88px)',
-                letterSpacing: '-0.045em',
-              }}
-            >
-              ASCII<span style={{ color: THEME.BLUE }}>.</span>CONV<span style={{ color: THEME.BLUE, animation: 'blink 1s steps(2) infinite' }}>_</span>
-            </h1>
-            <p className="mt-4 text-[13px] leading-relaxed max-w-[44ch]" style={{ color: THEME.MUTED }}>
-              The engine converts text and image into character grids.
-              Built for READMEs, CLI splash, socials, and print.
-            </p>
+        <header className="mb-5">
+          <div className="text-[10px] tracking-[0.28em] mb-3 flex items-center gap-2" style={{ color: THEME.MUTED }}>
+            <span style={{ color: THEME.BLUE }}>◆</span>
+            <span>CERTIK // INTERNAL BRANDING ENGINE</span>
           </div>
-          <div
-            className="hidden md:block text-right text-[10px] leading-[1.6] px-4 py-3"
-            style={{ color: THEME.MUTED, border: `1px solid ${THEME.HAIR}`, background: THEME.DEEP }}
+          <h1
+            className="leading-[0.9]"
+            style={{
+              fontFamily: '"JetBrains Mono", monospace',
+              fontWeight: 800,
+              fontSize: 'clamp(20px, 2.5vw, 36px)',
+              letterSpacing: '-0.045em',
+            }}
           >
-            <div style={{ color: THEME.TYPE }}>╔══════════════╗</div>
-            <div>║ TEXT → ASCII ║</div>
-            <div>║ IMG  → ASCII ║</div>
-            <div>║ OUT  → TXT   ║</div>
-            <div>║ OUT  → PNG   ║</div>
-            <div style={{ color: THEME.TYPE }}>╚══════════════╝</div>
-          </div>
+            ASCII<span style={{ color: THEME.BLUE }}>.</span>CONV<span style={{ color: THEME.BLUE, animation: 'blink 1s steps(2) infinite' }}>_</span>
+          </h1>
+          <p className="mt-3 text-[13px]" style={{ color: THEME.MUTED }}>
+            Text and image → character grids. For READMEs, CLI, socials, print.
+          </p>
         </header>
 
         <div
