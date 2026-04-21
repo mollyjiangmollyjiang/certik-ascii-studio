@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Copy, Download, Check, FileText } from 'lucide-react';
 
+const MONO_STACK = '"JetBrains Mono", "Cascadia Code", "Fira Code", "SF Mono", "Menlo", "Consolas", "DejaVu Sans Mono", "Noto Sans Mono", monospace';
+
 export default function Output({
   theme,
   ascii,
@@ -41,7 +43,7 @@ export default function Output({
     const lineHeight = fontSize * 1.15;
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    ctx.font = `500 ${fontSize}px "JetBrains Mono", monospace`;
+    ctx.font = `500 ${fontSize}px ${MONO_STACK}`;
     const charWidth = ctx.measureText('M').width;
     const maxLen = Math.max(...lines.map(l => l.length));
     const pad = 56;
@@ -52,7 +54,7 @@ export default function Output({
     ctx.fillStyle = background;
     ctx.fillRect(0, 0, w, h);
     ctx.fillStyle = foreground;
-    ctx.font = `500 ${fontSize}px "JetBrains Mono", monospace`;
+    ctx.font = `500 ${fontSize}px ${MONO_STACK}`;
     ctx.textBaseline = 'top';
     lines.forEach((line, i) => ctx.fillText(line, pad, pad + i * lineHeight));
     const a = document.createElement('a');
@@ -102,7 +104,7 @@ export default function Output({
         {displayed ? (
           <pre
             style={{
-              fontFamily: '"JetBrains Mono", monospace',
+              fontFamily: MONO_STACK,
               fontSize: '12px',
               lineHeight: 1.08,
               color: foreground,

@@ -33,11 +33,14 @@ export function canvasToAscii(canvas, widthChars, charset, fixedHeight, contrast
   }
   const img = ctx.getImageData(0, 0, srcW, srcH).data;
   const lastIdx = charset.length - 1;
-  // contrast 0.5 = linear; >0.5 = smoothstep S-curve pushing values toward 0/1;
-  // <0.5 = lerp toward 0.5 (middle gray).
+  // contrast 0.5 = linear; >0.5 = smoothstep S-curve pushing values toward 0/1
+  // (HARSH); <0.5 = anchored exponent curve that preserves 0/1 but steepens
+  // the mid-range (SOFT — middle stays mid-gray, extremes stay extreme, so
+  // pure-white background does not bleed into charset).
   const strength = (contrast - 0.5) * 2; // [-1, 1]
   const enhance = strength >= 0;
   const absStrength = Math.abs(strength);
+  const invK = enhance ? 1 : 1 / (1 + absStrength * 2); // SOFT: k in [1,3], exponent = 1/k
 
   let result = '';
   for (let cy = 0; cy < heightChars; cy++) {
@@ -57,9 +60,14 @@ export function canvasToAscii(canvas, widthChars, charset, fixedHeight, contrast
         }
       }
       const avg = count > 0 ? sum / count : 1;
-      const adjusted = enhance
-        ? avg + (avg * avg * (3 - 2 * avg) - avg) * absStrength
-        : avg + (0.5 - avg) * absStrength;
+      let adjusted;
+      if (enhance) {
+        const sCurve = avg * avg * (3 - 2 * avg);
+        adjusted = avg + (sCurve - avg) * strength;
+      } else {
+        const d = avg - 0.5;
+        adjusted = 0.5 + Math.sign(d) * Math.pow(Math.abs(d), invK) * 0.5;
+      }
       const idx = Math.min(lastIdx, Math.max(0, Math.floor(adjusted * charset.length)));
       result += charset[idx];
     }
