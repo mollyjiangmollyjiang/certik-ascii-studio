@@ -26,6 +26,8 @@ export default function App() {
   const [charsetKey, setCharsetKey] = useState('BLOCKS');
   const [customCharset, setCustomCharset] = useState('');
   const [invert, setInvert] = useState(false);
+  const [binaryMode, setBinaryMode] = useState(false);
+  const [threshold, setThreshold] = useState(0.5);
   const [previewSize, setPreviewSize] = useState(12);
   const [foreground, setForeground] = useState('#F5F5F0');
   const [background, setBackground] = useState('#0A0B0D');
@@ -74,8 +76,8 @@ export default function App() {
       ctx.fillStyle = 'black';
       ctx.fillText(text, w / 2, h / 2);
     }
-    setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows)));
-  }, [text, textStyle, cols, rows, charset]);
+    setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, binaryMode, threshold)));
+  }, [text, textStyle, cols, rows, charset, binaryMode, threshold]);
 
   const generateFromImage = useCallback(() => {
     if (!imageUrl) { setAscii(''); return; }
@@ -96,10 +98,10 @@ export default function App() {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, iw, ih);
       ctx.drawImage(img, 0, 0, iw, ih);
-      setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows)));
+      setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, binaryMode, threshold)));
     };
     img.src = imageUrl;
-  }, [imageUrl, cols, rows, charset]);
+  }, [imageUrl, cols, rows, charset, binaryMode, threshold]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -184,6 +186,8 @@ export default function App() {
             charsetKey={charsetKey} setCharsetKey={setCharsetKey}
             customCharset={customCharset} setCustomCharset={setCustomCharset}
             invert={invert} setInvert={setInvert}
+            binaryMode={binaryMode} setBinaryMode={setBinaryMode}
+            threshold={threshold} setThreshold={setThreshold}
             foreground={foreground} setForeground={setForeground}
             background={background} setBackground={setBackground}
           />

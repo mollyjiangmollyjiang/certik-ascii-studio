@@ -20,6 +20,8 @@ export default function Controls({
   charsetKey, setCharsetKey,
   customCharset, setCustomCharset,
   invert, setInvert,
+  binaryMode, setBinaryMode,
+  threshold, setThreshold,
   foreground, setForeground,
   background, setBackground,
 }) {
@@ -227,6 +229,47 @@ export default function Controls({
           <input type="checkbox" checked={invert} onChange={(e) => setInvert(e.target.checked)} className="hidden" />
           <span className="text-[11px] tracking-[0.12em] font-medium">INVERT TONAL MAPPING</span>
         </label>
+
+        <label className="flex items-center gap-3 cursor-pointer select-none mt-3">
+          <div
+            style={{
+              width: 16, height: 16,
+              border: `1px solid ${binaryMode ? BLUE : HAIR}`,
+              background: binaryMode ? BLUE : 'transparent',
+              display: 'grid', placeItems: 'center',
+              flexShrink: 0,
+            }}
+          >
+            {binaryMode && <Check size={10} color={TYPE} strokeWidth={3} />}
+          </div>
+          <input type="checkbox" checked={binaryMode} onChange={(e) => setBinaryMode(e.target.checked)} className="hidden" />
+          <div>
+            <div className="text-[11px] tracking-[0.12em] font-medium">BINARY MODE</div>
+            <div className="text-[10px] mt-0.5" style={{ color: MUTED }}>Two-tone rendering with threshold control</div>
+          </div>
+        </label>
+
+        {binaryMode && (
+          <div className="mt-3">
+            <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: MUTED }}>
+              <span>THRESHOLD</span>
+              <span style={{ color: TYPE }}>{threshold.toFixed(2)}</span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={threshold}
+              onChange={(e) => setThreshold(+e.target.value)}
+              className="w-full"
+              style={{ accentColor: BLUE }}
+            />
+            <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
+              <span>0.00</span><span>0.50</span><span>1.00</span>
+            </div>
+          </div>
+        )}
       </Section>
 
       <Section label="06 // COLORS" muted={MUTED}>
