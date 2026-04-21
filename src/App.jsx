@@ -24,8 +24,9 @@ export default function App() {
   const [imageName, setImageName] = useState('');
   const [cols, setCols] = useState(72);
   const [rows, setRows] = useState(30);
+  const [ratioLocked, setRatioLocked] = useState(true);
+  const [lockedRatio, setLockedRatio] = useState(30 / 72);
   const [charsetKey, setCharsetKey] = useState('BLOCKS');
-  const [customCharset, setCustomCharset] = useState('');
   const [invert, setInvert] = useState(false);
   const [enhanceContrast, setEnhanceContrast] = useState(true);
   const [foreground, setForeground] = useState('#F5F5F0');
@@ -62,11 +63,32 @@ export default function App() {
   }, []);
 
   const charset = useMemo(() => {
-    const base = charsetKey === 'CUSTOM'
-      ? (customCharset.length >= 2 ? customCharset : ' .')
-      : CHAR_SETS[charsetKey];
+    const base = CHAR_SETS[charsetKey];
     return invert ? base.split('').reverse().join('') : base;
-  }, [charsetKey, customCharset, invert]);
+  }, [charsetKey, invert]);
+
+  const handleColsChange = (newCols) => {
+    setCols(newCols);
+    if (ratioLocked) {
+      const derived = Math.max(20, Math.min(120, Math.round(newCols * lockedRatio)));
+      setRows(derived);
+    }
+  };
+
+  const handleRowsChange = (newRows) => {
+    setRows(newRows);
+    if (ratioLocked) {
+      const derived = Math.max(20, Math.min(160, Math.round(newRows / lockedRatio)));
+      setCols(derived);
+    }
+  };
+
+  const handleToggleLock = () => {
+    if (!ratioLocked) {
+      setLockedRatio(rows / cols);
+    }
+    setRatioLocked(!ratioLocked);
+  };
 
   const generateFromText = useCallback(() => {
     if (!text) { setAscii(''); return; }
@@ -180,10 +202,10 @@ export default function App() {
             textStyle={textStyle} setTextStyle={setTextStyle}
             imageUrl={imageUrl} setImageUrl={setImageUrl}
             imageName={imageName} setImageName={setImageName}
-            cols={cols} setCols={setCols}
-            rows={rows} setRows={setRows}
+            cols={cols} setCols={handleColsChange}
+            rows={rows} setRows={handleRowsChange}
+            ratioLocked={ratioLocked} onToggleLock={handleToggleLock}
             charsetKey={charsetKey} setCharsetKey={setCharsetKey}
-            customCharset={customCharset} setCustomCharset={setCustomCharset}
             invert={invert} setInvert={setInvert}
             enhanceContrast={enhanceContrast} setEnhanceContrast={setEnhanceContrast}
             foreground={foreground} setForeground={setForeground}

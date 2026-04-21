@@ -1,12 +1,11 @@
 import { useRef, useState } from 'react';
-import { Type, ImageIcon, Upload, Check, X } from 'lucide-react';
+import { Type, ImageIcon, Upload, Check, X, Link2, Unlink } from 'lucide-react';
 import { CHAR_SETS, TEXT_STYLES } from '../lib/engine';
 
 const CHARSET_KEYS = [
-  'GRADIENT', 'BLOCKS',   'DOTS',
-  'BINARY',   'DETAILED', 'CUSTOM',
+  'GRADIENT', 'BLOCKS',   'HALF-BLOCK',
+  'DOTS',     'BINARY',   'DETAILED',
   'FORMAL',   'AUDIT',    'THEOREM',
-  'HALF-BLOCK',
 ];
 
 export default function Controls({
@@ -18,8 +17,8 @@ export default function Controls({
   imageName, setImageName,
   cols, setCols,
   rows, setRows,
+  ratioLocked, onToggleLock,
   charsetKey, setCharsetKey,
-  customCharset, setCustomCharset,
   invert, setInvert,
   enhanceContrast, setEnhanceContrast,
   foreground, setForeground,
@@ -142,40 +141,27 @@ export default function Controls({
 
       <Section label="03 // CHARSET" muted={MUTED}>
         <div className="grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
-          {CHARSET_KEYS.map((k, i) => {
-            const fullWidth = k === 'HALF-BLOCK';
-            return (
-              <button
-                key={k}
-                onClick={() => setCharsetKey(k)}
-                style={{
-                  background: charsetKey === k ? TYPE : 'transparent',
-                  color: charsetKey === k ? INK : TYPE,
-                  borderRight: !fullWidth && (i + 1) % 3 !== 0 ? `1px solid ${HAIR}` : 'none',
-                  borderTop: i >= 3 ? `1px solid ${HAIR}` : 'none',
-                  gridColumn: fullWidth ? 'span 3' : undefined,
-                }}
-                className="px-1.5 py-2 text-[9.5px] tracking-[0.1em] font-semibold hover:bg-white/5"
-              >
-                {k}
-              </button>
-            );
-          })}
+          {CHARSET_KEYS.map((k, i) => (
+            <button
+              key={k}
+              onClick={() => setCharsetKey(k)}
+              style={{
+                background: charsetKey === k ? TYPE : 'transparent',
+                color: charsetKey === k ? INK : TYPE,
+                borderRight: (i + 1) % 3 !== 0 ? `1px solid ${HAIR}` : 'none',
+                borderTop: i >= 3 ? `1px solid ${HAIR}` : 'none',
+              }}
+              className="px-1.5 py-2 text-[9.5px] tracking-[0.1em] font-semibold hover:bg-white/5"
+            >
+              {k}
+            </button>
+          ))}
         </div>
-        {charsetKey === 'CUSTOM' && (
-          <input
-            value={customCharset}
-            onChange={(e) => setCustomCharset(e.target.value)}
-            placeholder="dense → sparse"
-            style={{ background: INK, border: `1px solid ${HAIR}`, color: TYPE }}
-            className="w-full mt-2 px-3 py-2 text-sm outline-none"
-          />
-        )}
         <div
           className="mt-2 px-3 py-2 text-[13px] overflow-hidden whitespace-nowrap"
           style={{ background: INK, border: `1px solid ${HAIR}`, color: MUTED, letterSpacing: '0.12em' }}
         >
-          {(charsetKey === 'CUSTOM' ? customCharset : CHAR_SETS[charsetKey]) || '—'}
+          {CHAR_SETS[charsetKey] || '—'}
         </div>
       </Section>
 
@@ -186,7 +172,22 @@ export default function Controls({
         </div>
       </Section>
 
-      <Section label="05 // GRID" muted={MUTED}>
+      <Section
+        label={`05 // GRID · ${cols}×${rows}`}
+        muted={MUTED}
+        right={
+          <button
+            onClick={onToggleLock}
+            style={{ color: ratioLocked ? TYPE : MUTED }}
+            className="flex items-center gap-1.5 text-[9px] tracking-[0.18em] hover:opacity-80 transition-opacity"
+          >
+            {ratioLocked
+              ? <Link2 size={14} strokeWidth={2} />
+              : <Unlink size={14} strokeWidth={2} />}
+            <span>{ratioLocked ? 'locked' : 'unlocked'}</span>
+          </button>
+        }
+      >
         <div className="flex items-center justify-between text-[10px] tracking-[0.18em]" style={{ color: MUTED }}>
           <span>COLS</span><span style={{ color: TYPE }}>{cols}</span>
         </div>
@@ -215,24 +216,19 @@ export default function Controls({
 
       <Section label="06 // OPTIONS" muted={MUTED}>
         {mode === 'image' && (
-          <label className="flex items-start gap-3 cursor-pointer select-none mb-3">
+          <label className="flex items-center gap-3 cursor-pointer select-none mb-3">
             <div
               style={{
                 width: 16, height: 16,
                 border: `1px solid ${enhanceContrast ? BLUE : HAIR}`,
                 background: enhanceContrast ? BLUE : 'transparent',
                 display: 'grid', placeItems: 'center',
-                flexShrink: 0,
-                marginTop: 1,
               }}
             >
               {enhanceContrast && <Check size={10} color={TYPE} strokeWidth={3} />}
             </div>
             <input type="checkbox" checked={enhanceContrast} onChange={(e) => setEnhanceContrast(e.target.checked)} className="hidden" />
-            <div>
-              <div className="text-[11px] tracking-[0.12em] font-medium">enhance contrast</div>
-              <div className="text-[10px] mt-0.5" style={{ color: MUTED }}>auto-adjust levels and contrast for cleaner output</div>
-            </div>
+            <span className="text-[11px] tracking-[0.12em] font-medium">enhance contrast</span>
           </label>
         )}
         <label className="flex items-center gap-3 cursor-pointer select-none">
@@ -255,10 +251,13 @@ export default function Controls({
   );
 }
 
-function Section({ label, children, muted }) {
+function Section({ label, children, muted, right }) {
   return (
     <div className="mb-5">
-      <div className="text-[10px] tracking-[0.22em] mb-2.5 font-semibold" style={{ color: muted }}>{label}</div>
+      <div className="flex items-center justify-between mb-2.5">
+        <div className="text-[10px] tracking-[0.22em] font-semibold" style={{ color: muted }}>{label}</div>
+        {right}
+      </div>
       {children}
     </div>
   );

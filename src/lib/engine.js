@@ -67,10 +67,12 @@ function applyAutoLevels(pixels) {
 }
 
 function applySCurve(pixels) {
+  // Ken Perlin's smootherstep: y = x^3 * (x * (6x - 15) + 10)
+  // More aggressive than smoothstep; flatter at 0/1 endpoints, steeper mid.
   const out = new Float32Array(pixels.length);
   for (let i = 0; i < pixels.length; i++) {
     const x = pixels[i];
-    out[i] = x * x * (3 - 2 * x);
+    out[i] = x * x * x * (x * (x * 6 - 15) + 10);
   }
   return out;
 }
