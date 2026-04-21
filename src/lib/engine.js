@@ -4,6 +4,9 @@ export const CHAR_SETS = {
   DOTS:     '●•∙· ',
   BINARY:   '10 ',
   DETAILED: '$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,"^`\'. ',
+  FORMAL:   '∀∃∈⊆⊇∧∨¬⇒□ ',
+  AUDIT:    '{}[]()<>=!&|+-*/# ',
+  THEOREM:  '∎■□▪▫· ',
 };
 
 export const TEXT_STYLES = [
@@ -15,13 +18,19 @@ export const TEXT_STYLES = [
 
 export const SCRAMBLE_POOL = '@#*+=-:.01█▓▒░█▓▒░·•●';
 
-export function canvasToAscii(canvas, widthChars, charset) {
+export function canvasToAscii(canvas, widthChars, charset, fixedHeight) {
   const ctx = canvas.getContext('2d');
   const srcW = canvas.width;
   const srcH = canvas.height;
   const cellW = srcW / widthChars;
-  const cellH = cellW * 2;
-  const heightChars = Math.max(1, Math.floor(srcH / cellH));
+  let heightChars, cellH;
+  if (fixedHeight && fixedHeight > 0) {
+    heightChars = fixedHeight;
+    cellH = srcH / heightChars;
+  } else {
+    cellH = cellW * 2;
+    heightChars = Math.max(1, Math.floor(srcH / cellH));
+  }
   const img = ctx.getImageData(0, 0, srcW, srcH).data;
 
   let result = '';

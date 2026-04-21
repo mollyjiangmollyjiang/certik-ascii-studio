@@ -10,6 +10,8 @@ export default function Output({
   filename,
   previewSize,
   setPreviewSize,
+  foreground,
+  background,
 }) {
   const { INK, DEEP, HAIR, TYPE, MUTED, BLUE } = theme;
   const [copied, setCopied] = useState(false);
@@ -49,9 +51,9 @@ export default function Output({
     const h = Math.ceil(lineHeight * lines.length) + pad * 2;
     canvas.width = w;
     canvas.height = h;
-    ctx.fillStyle = '#0A0B0D';
+    ctx.fillStyle = background;
     ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = '#F5F5F0';
+    ctx.fillStyle = foreground;
     ctx.font = `500 ${fontSize}px "JetBrains Mono", monospace`;
     ctx.textBaseline = 'top';
     lines.forEach((line, i) => ctx.fillText(line, pad, pad + i * lineHeight));
@@ -93,7 +95,7 @@ export default function Output({
       <div
         className="flex-1 overflow-auto p-6 md:p-10"
         style={{
-          background: INK,
+          background: background,
           backgroundImage: `radial-gradient(ellipse at center, rgba(199,0,66,0.05) 0%, transparent 60%)`,
         }}
       >
@@ -103,7 +105,7 @@ export default function Output({
               fontFamily: '"JetBrains Mono", monospace',
               fontSize: `${previewSize}px`,
               lineHeight: 1.08,
-              color: TYPE,
+              color: foreground,
               whiteSpace: 'pre',
               letterSpacing: '0',
               margin: 0,

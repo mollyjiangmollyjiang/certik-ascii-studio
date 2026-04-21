@@ -1,6 +1,6 @@
 import { useClock } from '../lib/clock';
 
-export function TopStatusBar({ theme, isAnimating, charsetKey, width }) {
+export function TopStatusBar({ theme, isAnimating, charsetKey, cols, rows }) {
   const { DEEP, HAIR, TYPE, MUTED, BLUE } = theme;
   const clock = useClock();
 
@@ -25,7 +25,9 @@ export function TopStatusBar({ theme, isAnimating, charsetKey, width }) {
       <div className="hidden md:flex items-center gap-3">
         <span>CHARSET:{charsetKey}</span>
         <span>//</span>
-        <span>W:{width}</span>
+        <span>C:{cols}</span>
+        <span>//</span>
+        <span>R:{rows}</span>
         <span>//</span>
         <span>T:{clock}</span>
       </div>
