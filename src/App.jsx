@@ -29,6 +29,8 @@ export default function App() {
   const [charsetKey, setCharsetKey] = useState('BLOCKS');
   const [invert, setInvert] = useState(false);
   const [enhanceContrast, setEnhanceContrast] = useState(true);
+  const [isolateSubject, setIsolateSubject] = useState(false);
+  const [subjectThreshold, setSubjectThreshold] = useState(0.65);
   const [foreground, setForeground] = useState('#F5F5F0');
   const [background, setBackground] = useState('#0A0B0D');
   const [ascii, setAscii] = useState('');
@@ -62,10 +64,7 @@ export default function App() {
     }
   }, []);
 
-  const charset = useMemo(() => {
-    const base = CHAR_SETS[charsetKey];
-    return invert ? base.split('').reverse().join('') : base;
-  }, [charsetKey, invert]);
+  const charset = useMemo(() => CHAR_SETS[charsetKey], [charsetKey]);
 
   const handleColsChange = (newCols) => {
     setCols(newCols);
@@ -117,8 +116,8 @@ export default function App() {
       ctx.fillStyle = 'black';
       ctx.fillText(text, w / 2, h / 2);
     }
-    setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, enhanceContrast)));
-  }, [text, textStyle, cols, rows, charset, enhanceContrast]);
+    setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, invert, isolateSubject, subjectThreshold, enhanceContrast)));
+  }, [text, textStyle, cols, rows, charset, invert, isolateSubject, subjectThreshold, enhanceContrast]);
 
   const generateFromImage = useCallback(() => {
     if (!imageUrl) { setAscii(''); return; }
@@ -139,10 +138,10 @@ export default function App() {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, iw, ih);
       ctx.drawImage(img, 0, 0, iw, ih);
-      setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, enhanceContrast)));
+      setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, invert, isolateSubject, subjectThreshold, enhanceContrast)));
     };
     img.src = imageUrl;
-  }, [imageUrl, cols, rows, charset, enhanceContrast]);
+  }, [imageUrl, cols, rows, charset, invert, isolateSubject, subjectThreshold, enhanceContrast]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -208,6 +207,8 @@ export default function App() {
             charsetKey={charsetKey} setCharsetKey={setCharsetKey}
             invert={invert} setInvert={setInvert}
             enhanceContrast={enhanceContrast} setEnhanceContrast={setEnhanceContrast}
+            isolateSubject={isolateSubject} setIsolateSubject={setIsolateSubject}
+            subjectThreshold={subjectThreshold} setSubjectThreshold={setSubjectThreshold}
             foreground={foreground} setForeground={setForeground}
             background={background} setBackground={setBackground}
           />

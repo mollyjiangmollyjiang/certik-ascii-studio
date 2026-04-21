@@ -21,6 +21,8 @@ export default function Controls({
   charsetKey, setCharsetKey,
   invert, setInvert,
   enhanceContrast, setEnhanceContrast,
+  isolateSubject, setIsolateSubject,
+  subjectThreshold, setSubjectThreshold,
   foreground, setForeground,
   background, setBackground,
 }) {
@@ -245,6 +247,47 @@ export default function Controls({
           <input type="checkbox" checked={invert} onChange={(e) => setInvert(e.target.checked)} className="hidden" />
           <span className="text-[11px] tracking-[0.12em] font-medium">flip the lights</span>
         </label>
+
+        {mode === 'image' && (
+          <>
+            <label className="flex items-center gap-3 cursor-pointer select-none mt-3">
+              <div
+                style={{
+                  width: 16, height: 16,
+                  border: `1px solid ${isolateSubject ? BLUE : HAIR}`,
+                  background: isolateSubject ? BLUE : 'transparent',
+                  display: 'grid', placeItems: 'center',
+                }}
+              >
+                {isolateSubject && <Check size={10} color={TYPE} strokeWidth={3} />}
+              </div>
+              <input type="checkbox" checked={isolateSubject} onChange={(e) => setIsolateSubject(e.target.checked)} className="hidden" />
+              <span className="text-[11px] tracking-[0.12em] font-medium">isolate subject</span>
+            </label>
+
+            {isolateSubject && (
+              <div className="mt-3">
+                <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: MUTED }}>
+                  <span>subject threshold</span>
+                  <span style={{ color: TYPE }}>{subjectThreshold.toFixed(2)}</span>
+                </div>
+                <input
+                  type="range"
+                  min={0.3}
+                  max={0.95}
+                  step={0.01}
+                  value={subjectThreshold}
+                  onChange={(e) => setSubjectThreshold(+e.target.value)}
+                  className="w-full"
+                  style={{ accentColor: BLUE }}
+                />
+                <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
+                  <span>keep more</span><span>keep less</span>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </Section>
 
     </aside>

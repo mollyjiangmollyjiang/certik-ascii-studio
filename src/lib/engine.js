@@ -5,7 +5,7 @@ export const CHAR_SETS = {
   DOTS:         '●•∙· ',
   BINARY:       '10 ',
   DETAILED:     '$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,"^`\'. ',
-  FORMAL:       '∀∃∮∑∏∫⊕⊗⊆⊇∈∉∧∨¬⇒⇔≡≠≤≥□ ',
+  FORMAL:       '∀∃∮∑∏∫⊕⊗⊆⊇∈∉∧∨¬⇒⇔≡≠≤≥ ',
   AUDIT:        '@#$%^&*{}[]()<>/\\|~=!?:;.,+- ',
   THEOREM:      '∎■□▪▫· ',
 };
@@ -42,8 +42,9 @@ function applyAutoLevels(pixels) {
     hist[b]++;
   }
   const total = pixels.length;
-  const loThresh = total * 0.02;
-  const hiThresh = total * 0.98;
+  // more aggressive clipping: 5% / 95% percentiles
+  const loThresh = total * 0.05;
+  const hiThresh = total * 0.95;
   let lo = 0, hi = BUCKETS - 1, cum = 0;
   for (let i = 0; i < BUCKETS; i++) {
     cum += hist[i];
@@ -67,17 +68,29 @@ function applyAutoLevels(pixels) {
 }
 
 function applySCurve(pixels) {
-  // Ken Perlin's smootherstep: y = x^3 * (x * (6x - 15) + 10)
-  // More aggressive than smoothstep; flatter at 0/1 endpoints, steeper mid.
+  // Ken Perlin's smootherstep applied twice — extreme dark/light separation
+  // for low-contrast inputs. First pass boosts to strong S; second pass
+  // pushes plateaus even flatter at 0/1 and steepens the transition again.
   const out = new Float32Array(pixels.length);
   for (let i = 0; i < pixels.length; i++) {
-    const x = pixels[i];
-    out[i] = x * x * x * (x * (x * 6 - 15) + 10);
+    let x = pixels[i];
+    x = x * x * x * (x * (x * 6 - 15) + 10);
+    x = x * x * x * (x * (x * 6 - 15) + 10);
+    out[i] = x;
   }
   return out;
 }
 
-export function canvasToAscii(canvas, widthChars, charset, fixedHeight, enhanceContrast = true) {
+export function canvasToAscii(
+  canvas,
+  widthChars,
+  charset,
+  fixedHeight,
+  invert = false,
+  isolateSubject = false,
+  subjectThreshold = 0.65,
+  enhanceContrast = true,
+) {
   const ctx = canvas.getContext('2d');
   const srcW = canvas.width;
   const srcH = canvas.height;
@@ -112,9 +125,14 @@ export function canvasToAscii(canvas, widthChars, charset, fixedHeight, enhanceC
           count++;
         }
       }
-      const avg = count > 0 ? sum / count : 1;
-      const idx = Math.min(lastIdx, Math.max(0, Math.floor(avg * charset.length)));
-      result += charset[idx];
+      let avg = count > 0 ? sum / count : 1;
+      if (invert) avg = 1 - avg;
+      if (isolateSubject && avg > subjectThreshold) {
+        result += ' ';
+      } else {
+        const idx = Math.min(lastIdx, Math.max(0, Math.floor(avg * charset.length)));
+        result += charset[idx];
+      }
     }
     result += '\n';
   }
