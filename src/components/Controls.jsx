@@ -17,7 +17,6 @@ export default function Controls({
   imageName, setImageName,
   cols, setCols,
   rows, setRows,
-  contrast, setContrast,
   charsetKey, setCharsetKey,
   customCharset, setCustomCharset,
   invert, setInvert,
@@ -139,61 +138,7 @@ export default function Controls({
         )}
       </Section>
 
-      <Section label={`03 // GRID · ${cols}×${rows}`} muted={MUTED}>
-        <div>
-          <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: MUTED }}>
-            <span>COLS</span><span style={{ color: TYPE }}>{cols}</span>
-          </div>
-          <input
-            type="range"
-            min={20}
-            max={160}
-            value={cols}
-            onChange={(e) => setCols(+e.target.value)}
-            className="w-full"
-            style={{ accentColor: BLUE }}
-          />
-          <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
-            <span>20</span><span>80</span><span>160</span>
-          </div>
-        </div>
-
-        <div className="mt-3">
-          <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: MUTED }}>
-            <span>ROWS</span><span style={{ color: TYPE }}>{rows}</span>
-          </div>
-          <input
-            type="range"
-            min={20}
-            max={120}
-            value={rows}
-            onChange={(e) => setRows(+e.target.value)}
-            className="w-full"
-            style={{ accentColor: BLUE }}
-          />
-          <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
-            <span>20</span><span>70</span><span>120</span>
-          </div>
-        </div>
-      </Section>
-
-      <Section label={`04 // CONTRAST · ${contrast.toFixed(2)}`} muted={MUTED}>
-        <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.01}
-          value={contrast}
-          onChange={(e) => setContrast(+e.target.value)}
-          className="w-full"
-          style={{ accentColor: BLUE }}
-        />
-        <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
-          <span>SOFT</span><span>BALANCED</span><span>HARSH</span>
-        </div>
-      </Section>
-
-      <Section label="05 // CHARSET" muted={MUTED}>
+      <Section label="03 // CHARSET" muted={MUTED}>
         <div className="grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
           {CHARSET_KEYS.map((k, i) => (
             <button
@@ -228,6 +173,40 @@ export default function Controls({
         </div>
       </Section>
 
+      <Section label="04 // COLORS" muted={MUTED}>
+        <div className="grid grid-cols-2 gap-2">
+          <ColorField label="FG" value={foreground} onChange={setForeground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
+          <ColorField label="BG" value={background} onChange={setBackground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
+        </div>
+      </Section>
+
+      <Section label="05 // GRID" muted={MUTED}>
+        <div className="flex items-center justify-between text-[10px] tracking-[0.18em]" style={{ color: MUTED }}>
+          <span>COLS</span><span style={{ color: TYPE }}>{cols}</span>
+        </div>
+        <input
+          type="range"
+          min={20}
+          max={160}
+          value={cols}
+          onChange={(e) => setCols(+e.target.value)}
+          className="w-full mt-1"
+          style={{ accentColor: BLUE }}
+        />
+        <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mt-2" style={{ color: MUTED }}>
+          <span>ROWS</span><span style={{ color: TYPE }}>{rows}</span>
+        </div>
+        <input
+          type="range"
+          min={20}
+          max={120}
+          value={rows}
+          onChange={(e) => setRows(+e.target.value)}
+          className="w-full mt-1"
+          style={{ accentColor: BLUE }}
+        />
+      </Section>
+
       <Section label="06 // OPTIONS" muted={MUTED}>
         <label className="flex items-center gap-3 cursor-pointer select-none">
           <div
@@ -243,13 +222,6 @@ export default function Controls({
           <input type="checkbox" checked={invert} onChange={(e) => setInvert(e.target.checked)} className="hidden" />
           <span className="text-[11px] tracking-[0.12em] font-medium">INVERT TONAL MAPPING</span>
         </label>
-      </Section>
-
-      <Section label="07 // COLORS" muted={MUTED}>
-        <div className="grid grid-cols-2 gap-2">
-          <ColorField label="FG" value={foreground} onChange={setForeground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
-          <ColorField label="BG" value={background} onChange={setBackground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
-        </div>
       </Section>
 
     </aside>
