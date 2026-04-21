@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Copy, Download, Check, FileText } from 'lucide-react';
+import { Copy, Download, Check, Code } from 'lucide-react';
 
 const MONO_STACK = '"JetBrains Mono", "Cascadia Code", "Fira Code", "SF Mono", "Menlo", "Consolas", "DejaVu Sans Mono", "Noto Sans Mono", monospace';
 
@@ -26,12 +26,29 @@ export default function Output({
     setTimeout(() => setCopied(false), 1200);
   };
 
-  const handleDownloadTxt = () => {
-    const blob = new Blob([ascii], { type: 'text/plain' });
+  const handleDownloadSvg = () => {
+    if (!ascii) return;
+    const lines = ascii.split('\n');
+    const fontSize = 12;
+    const charWidth = fontSize * 0.6;
+    const lineHeight = fontSize * 1.15;
+    const padding = fontSize;
+    const maxLen = Math.max(...lines.map(l => l.length));
+    const svgWidth = Math.ceil(maxLen * charWidth + padding * 2);
+    const svgHeight = Math.ceil(lines.length * lineHeight + padding * 2);
+    const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}">`;
+    svg += `<rect width="${svgWidth}" height="${svgHeight}" fill="${background}"/>`;
+    lines.forEach((line, i) => {
+      const y = padding + (i + 1) * lineHeight - lineHeight * 0.25;
+      svg += `<text x="${padding}" y="${y}" font-family='${MONO_STACK}' font-size="${fontSize}" fill="${foreground}" xml:space="preserve">${escape(line)}</text>`;
+    });
+    svg += '</svg>';
+    const blob = new Blob([svg], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `${filename}.txt`;
+    a.download = `${filename}.svg`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -83,9 +100,9 @@ export default function Output({
             {copied ? <Check size={11} strokeWidth={2.5} /> : <Copy size={11} strokeWidth={2.5} />}
             <span>{copied ? 'COPIED' : 'COPY'}</span>
           </ExportButton>
-          <ExportButton onClick={handleDownloadTxt} disabled={!ascii} type={TYPE} hair={HAIR} borderLeft>
-            <FileText size={11} strokeWidth={2.5} />
-            <span>.TXT</span>
+          <ExportButton onClick={handleDownloadSvg} disabled={!ascii} type={TYPE} hair={HAIR} borderLeft>
+            <Code size={11} strokeWidth={2.5} />
+            <span>.SVG</span>
           </ExportButton>
           <ExportButton onClick={handleDownloadPng} disabled={!ascii} type={TYPE} hair={HAIR} borderLeft primary blue={BLUE}>
             <Download size={11} strokeWidth={2.5} />

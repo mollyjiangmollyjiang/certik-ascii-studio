@@ -1,12 +1,13 @@
 export const CHAR_SETS = {
-  GRADIENT: '@%#*+=-:. ',
-  BLOCKS:   '█▓▒░ ',
-  DOTS:     '●•∙· ',
-  BINARY:   '10 ',
-  DETAILED: '$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,"^`\'. ',
-  FORMAL:   '∀∃∈⊆⊇∧∨¬⇒□ ',
-  AUDIT:    '{}[]()<>=!&|+-*/# ',
-  THEOREM:  '∎■□▪▫· ',
+  GRADIENT:     '@%#*+=-:. ',
+  BLOCKS:       '█▓▒░ ',
+  'HALF-BLOCK': '█▓▒░▘▝▖▗▀▄▌▐ ',
+  DOTS:         '●•∙· ',
+  BINARY:       '10 ',
+  DETAILED:     '$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,"^`\'. ',
+  FORMAL:       '∀∃∈⊆⊇∧∨¬⇒□ ',
+  AUDIT:        '{}[]()<>=!&|+-*/# ',
+  THEOREM:      '∎■□▪▫· ',
 };
 
 export const TEXT_STYLES = [

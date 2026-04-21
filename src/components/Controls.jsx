@@ -3,9 +3,10 @@ import { Type, ImageIcon, Upload, Check, X } from 'lucide-react';
 import { CHAR_SETS, TEXT_STYLES } from '../lib/engine';
 
 const CHARSET_KEYS = [
-  'GRADIENT', 'BLOCKS', 'DOTS',
+  'GRADIENT', 'BLOCKS',   'DOTS',
   'BINARY',   'DETAILED', 'CUSTOM',
   'FORMAL',   'AUDIT',    'THEOREM',
+  'HALF-BLOCK',
 ];
 
 export default function Controls({
@@ -45,13 +46,13 @@ export default function Controls({
     <aside className="p-5 md:p-6 md:h-full md:overflow-y-auto" style={{ borderRight: `1px solid ${HAIR}`, background: DEEP }}>
       <Section label="01 // MODE" muted={MUTED}>
         <div className="grid grid-cols-2 gap-0" style={{ border: `1px solid ${HAIR}` }}>
-          <Toggle active={mode === 'text'} onClick={() => setMode('text')} ink={INK} type={TYPE} hair={HAIR}>
-            <Type size={12} strokeWidth={2.5} />
-            <span>TEXT</span>
-          </Toggle>
-          <Toggle active={mode === 'image'} onClick={() => setMode('image')} ink={INK} type={TYPE} hair={HAIR} borderLeft>
+          <Toggle active={mode === 'image'} onClick={() => setMode('image')} ink={INK} type={TYPE} hair={HAIR}>
             <ImageIcon size={12} strokeWidth={2.5} />
             <span>IMAGE</span>
+          </Toggle>
+          <Toggle active={mode === 'text'} onClick={() => setMode('text')} ink={INK} type={TYPE} hair={HAIR} borderLeft>
+            <Type size={12} strokeWidth={2.5} />
+            <span>TEXT</span>
           </Toggle>
         </div>
       </Section>
@@ -140,21 +141,25 @@ export default function Controls({
 
       <Section label="03 // CHARSET" muted={MUTED}>
         <div className="grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
-          {CHARSET_KEYS.map((k, i) => (
-            <button
-              key={k}
-              onClick={() => setCharsetKey(k)}
-              style={{
-                background: charsetKey === k ? TYPE : 'transparent',
-                color: charsetKey === k ? INK : TYPE,
-                borderRight: (i + 1) % 3 !== 0 ? `1px solid ${HAIR}` : 'none',
-                borderTop: i >= 3 ? `1px solid ${HAIR}` : 'none',
-              }}
-              className="px-1.5 py-2 text-[9.5px] tracking-[0.1em] font-semibold hover:bg-white/5"
-            >
-              {k}
-            </button>
-          ))}
+          {CHARSET_KEYS.map((k, i) => {
+            const fullWidth = k === 'HALF-BLOCK';
+            return (
+              <button
+                key={k}
+                onClick={() => setCharsetKey(k)}
+                style={{
+                  background: charsetKey === k ? TYPE : 'transparent',
+                  color: charsetKey === k ? INK : TYPE,
+                  borderRight: !fullWidth && (i + 1) % 3 !== 0 ? `1px solid ${HAIR}` : 'none',
+                  borderTop: i >= 3 ? `1px solid ${HAIR}` : 'none',
+                  gridColumn: fullWidth ? 'span 3' : undefined,
+                }}
+                className="px-1.5 py-2 text-[9.5px] tracking-[0.1em] font-semibold hover:bg-white/5"
+              >
+                {k}
+              </button>
+            );
+          })}
         </div>
         {charsetKey === 'CUSTOM' && (
           <input
