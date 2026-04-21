@@ -16,9 +16,10 @@ const THEME = {
 };
 
 export default function App() {
-  const [mode, setMode] = useState('text');
+  const [mode, setMode] = useState('image');
   const [text, setText] = useState('CERTIK');
-  const [textStyle, setTextStyle] = useState('DISPLAY');
+  const [textStyle, setTextStyle] = useState('LOGO');
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [imageName, setImageName] = useState('');
   const [cols, setCols] = useState(72);
@@ -32,11 +33,31 @@ export default function App() {
   const { displayed, isAnimating } = useScramble(ascii);
 
   useEffect(() => {
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Archivo+Black&family=Playfair+Display:ital,wght@0,900;1,900&family=Roboto+Slab:wght@900&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-    return () => { try { document.head.removeChild(link); } catch { /* noop */ } };
+    const google = document.createElement('link');
+    google.href = 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&family=Playfair+Display:ital,wght@0,900;1,900&display=swap';
+    google.rel = 'stylesheet';
+    document.head.appendChild(google);
+
+    const satoshi = document.createElement('link');
+    satoshi.href = 'https://api.fontshare.com/v2/css?f[]=satoshi@900&display=swap';
+    satoshi.rel = 'stylesheet';
+    document.head.appendChild(satoshi);
+
+    return () => {
+      try { document.head.removeChild(google); } catch { /* noop */ }
+      try { document.head.removeChild(satoshi); } catch { /* noop */ }
+    };
+  }, []);
+
+  useEffect(() => {
+    const visited = localStorage.getItem('ascii-studio-visited');
+    if (!visited) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsFirstVisit(true);
+      localStorage.setItem('ascii-studio-visited', '1');
+      const t = setTimeout(() => setIsFirstVisit(false), 3000);
+      return () => clearTimeout(t);
+    }
   }, []);
 
   const charset = useMemo(() => {
@@ -141,6 +162,7 @@ export default function App() {
         <TopStatusBar
           theme={THEME}
           isAnimating={isAnimating}
+          isFirstVisit={isFirstVisit}
           charsetKey={charsetKey}
           cols={cols}
           rows={rows}
@@ -188,6 +210,10 @@ export default function App() {
         @keyframes blink {
           0%, 50% { opacity: 1; }
           51%, 100% { opacity: 0; }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
         }
       `}</style>
     </div>

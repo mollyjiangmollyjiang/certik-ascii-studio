@@ -117,7 +117,7 @@ export default function Controls({
                 <img src={imageUrl} alt="" className="w-10 h-10 object-contain" style={{ border: `1px solid ${HAIR}`, background: '#fff' }} />
                 <div className="flex-1 text-left overflow-hidden">
                   <div className="text-[11px] font-semibold truncate">{imageName}</div>
-                  <div className="text-[10px] tracking-[0.15em]" style={{ color: MUTED }}>TAP TO REPLACE</div>
+                  <div className="text-[10px] tracking-[0.15em]" style={{ color: MUTED }}>tap to replace</div>
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); setImageUrl(null); setImageName(''); }}
@@ -130,8 +130,8 @@ export default function Controls({
             ) : (
               <>
                 <Upload size={18} className="mx-auto mb-3" strokeWidth={1.8} style={{ color: MUTED }} />
-                <div className="text-[11px] tracking-[0.2em] font-semibold">DROP IMAGE</div>
-                <div className="text-[10px] mt-1 tracking-[0.15em]" style={{ color: MUTED }}>OR CLICK TO BROWSE</div>
+                <div className="text-[11px] tracking-[0.2em] font-semibold">drop anything here</div>
+                <div className="text-[10px] mt-1 tracking-[0.15em]" style={{ color: MUTED }}>or click to browse</div>
               </>
             )}
           </div>
@@ -220,7 +220,7 @@ export default function Controls({
             {invert && <Check size={10} color={TYPE} strokeWidth={3} />}
           </div>
           <input type="checkbox" checked={invert} onChange={(e) => setInvert(e.target.checked)} className="hidden" />
-          <span className="text-[11px] tracking-[0.12em] font-medium">INVERT TONAL MAPPING</span>
+          <span className="text-[11px] tracking-[0.12em] font-medium">flip the lights</span>
         </label>
       </Section>
 

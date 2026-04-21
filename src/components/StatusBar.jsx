@@ -1,8 +1,9 @@
 import { useClock } from '../lib/clock';
 
-export function TopStatusBar({ theme, isAnimating, charsetKey, cols, rows }) {
+export function TopStatusBar({ theme, isAnimating, isFirstVisit, charsetKey, cols, rows }) {
   const { DEEP, HAIR, TYPE, MUTED, BLUE } = theme;
   const clock = useClock();
+  const statusLabel = isFirstVisit ? 'welcome ✦' : (isAnimating ? 'weaving' : 'READY');
 
   return (
     <div
@@ -20,11 +21,19 @@ export function TopStatusBar({ theme, isAnimating, charsetKey, cols, rows }) {
             width: 8, height: 8, borderRadius: '50%',
             background: isAnimating ? BLUE : '#22C55E',
             boxShadow: `0 0 10px ${isAnimating ? BLUE : '#22C55E'}`,
-            animation: 'pulse 1.6s ease-in-out infinite',
+            animation: 'pulse 2.4s ease-in-out infinite',
             flexShrink: 0,
           }}
         />
-        <span style={{ color: TYPE }}>{isAnimating ? 'RESOLVING' : 'READY'}</span>
+        <span
+          key={statusLabel}
+          style={{
+            color: TYPE,
+            animation: 'fadeIn 0.4s ease',
+          }}
+        >
+          {statusLabel}
+        </span>
         <span>//</span>
         <span>ASCII-CONV v1.0</span>
       </div>

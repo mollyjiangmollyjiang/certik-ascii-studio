@@ -10,10 +10,10 @@ export const CHAR_SETS = {
 };
 
 export const TEXT_STYLES = [
-  { key: 'DISPLAY', label: 'DISPLAY', font: '"Archivo Black", sans-serif', weight: 400 },
-  { key: 'SERIF',   label: 'SERIF',   font: '"Playfair Display", serif',   weight: 900 },
-  { key: 'SLAB',    label: 'SLAB',    font: '"Roboto Slab", serif',        weight: 900 },
-  { key: 'OUTLINE', label: 'OUTLINE', font: '"Archivo Black", sans-serif', weight: 400, outline: true },
+  { key: 'LOGO',    label: 'LOGO',    font: '"Orbitron", sans-serif',    weight: 900 },
+  { key: 'DISPLAY', label: 'DISPLAY', font: '"Satoshi", sans-serif',     weight: 900 },
+  { key: 'SERIF',   label: 'SERIF',   font: '"Playfair Display", serif', weight: 900 },
+  { key: 'OUTLINE', label: 'OUTLINE', font: '"Orbitron", sans-serif',    weight: 900, outline: true },
 ];
 
 export const SCRAMBLE_POOL = '@#*+=-:.01█▓▒░█▓▒░·•●';

@@ -72,10 +72,10 @@ export default function Output({
         <div className="flex items-center gap-4 text-[10px] tracking-[0.18em] flex-wrap" style={{ color: MUTED }}>
           <span className="font-semibold" style={{ color: TYPE }}>OUTPUT</span>
           <span>//</span>
-          <span>GRID {colCount}×{lineCount}</span>
+          <span>{colCount}×{lineCount} grid</span>
           <span>//</span>
-          <span>{charCount.toLocaleString()} CHARS</span>
-          {isAnimating && (<><span>//</span><span style={{ color: BLUE }}>SCANNING...</span></>)}
+          <span>{charCount.toLocaleString()} characters</span>
+          {isAnimating && (<><span>//</span><span style={{ color: BLUE }}>thinking...</span></>)}
         </div>
 
         <div className="flex items-stretch flex-shrink-0" style={{ border: `1px solid ${HAIR}` }}>
@@ -122,8 +122,8 @@ export default function Output({
             <div>
               <div className="text-[10px] tracking-[0.22em] mb-2">NO SIGNAL</div>
               <div className="text-[11px] tracking-[0.12em]">
-                {mode === 'text' ? '> awaiting text input' : '> awaiting image drop'}
-                <span style={{ color: BLUE, animation: 'blink 1s steps(2) infinite' }}>_</span>
+                {mode === 'text' ? '> waiting for you' : '> drop anything here'}
+                <span style={{ color: BLUE, animation: 'blink 1.6s steps(2) infinite' }}>_</span>
               </div>
             </div>
           </div>
