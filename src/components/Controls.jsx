@@ -17,7 +17,7 @@ export default function Controls({
   imageName, setImageName,
   cols, setCols,
   rows, setRows,
-  density, setDensity,
+  contrast, setContrast,
   charsetKey, setCharsetKey,
   customCharset, setCustomCharset,
   invert, setInvert,
@@ -177,19 +177,19 @@ export default function Controls({
         </div>
       </Section>
 
-      <Section label={`04 // DENSITY · ${density.toFixed(2)}`} muted={MUTED}>
+      <Section label={`04 // CONTRAST · ${contrast.toFixed(2)}`} muted={MUTED}>
         <input
           type="range"
           min={0}
           max={1}
           step={0.01}
-          value={density}
-          onChange={(e) => setDensity(+e.target.value)}
+          value={contrast}
+          onChange={(e) => setContrast(+e.target.value)}
           className="w-full"
           style={{ accentColor: BLUE }}
         />
         <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
-          <span>SPARSE</span><span>LINEAR</span><span>DENSE</span>
+          <span>SOFT</span><span>BALANCED</span><span>HARSH</span>
         </div>
       </Section>
 

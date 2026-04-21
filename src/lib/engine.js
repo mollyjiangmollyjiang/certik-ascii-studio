@@ -18,7 +18,7 @@ export const TEXT_STYLES = [
 
 export const SCRAMBLE_POOL = '@#*+=-:.01█▓▒░█▓▒░·•●';
 
-export function canvasToAscii(canvas, widthChars, charset, fixedHeight, density = 0.5) {
+export function canvasToAscii(canvas, widthChars, charset, fixedHeight, contrast = 0.5) {
   const ctx = canvas.getContext('2d');
   const srcW = canvas.width;
   const srcH = canvas.height;
@@ -33,8 +33,11 @@ export function canvasToAscii(canvas, widthChars, charset, fixedHeight, density 
   }
   const img = ctx.getImageData(0, 0, srcW, srcH).data;
   const lastIdx = charset.length - 1;
-  // density 0 -> exponent 2 (sparse), 0.5 -> exponent 1 (linear), 1 -> exponent 0 (dense)
-  const exponent = 2 - density * 2;
+  // contrast 0.5 = linear; >0.5 = smoothstep S-curve pushing values toward 0/1;
+  // <0.5 = lerp toward 0.5 (middle gray).
+  const strength = (contrast - 0.5) * 2; // [-1, 1]
+  const enhance = strength >= 0;
+  const absStrength = Math.abs(strength);
 
   let result = '';
   for (let cy = 0; cy < heightChars; cy++) {
@@ -54,8 +57,10 @@ export function canvasToAscii(canvas, widthChars, charset, fixedHeight, density 
         }
       }
       const avg = count > 0 ? sum / count : 1;
-      const biased = Math.pow(avg, exponent);
-      const idx = Math.min(lastIdx, Math.max(0, Math.floor(biased * charset.length)));
+      const adjusted = enhance
+        ? avg + (avg * avg * (3 - 2 * avg) - avg) * absStrength
+        : avg + (0.5 - avg) * absStrength;
+      const idx = Math.min(lastIdx, Math.max(0, Math.floor(adjusted * charset.length)));
       result += charset[idx];
     }
     result += '\n';

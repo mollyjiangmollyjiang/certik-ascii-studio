@@ -23,7 +23,7 @@ export default function App() {
   const [imageName, setImageName] = useState('');
   const [cols, setCols] = useState(72);
   const [rows, setRows] = useState(30);
-  const [density, setDensity] = useState(0.5);
+  const [contrast, setContrast] = useState(0.5);
   const [charsetKey, setCharsetKey] = useState('BLOCKS');
   const [customCharset, setCustomCharset] = useState('');
   const [invert, setInvert] = useState(false);
@@ -74,8 +74,8 @@ export default function App() {
       ctx.fillStyle = 'black';
       ctx.fillText(text, w / 2, h / 2);
     }
-    setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, density)));
-  }, [text, textStyle, cols, rows, density, charset]);
+    setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, contrast)));
+  }, [text, textStyle, cols, rows, contrast, charset]);
 
   const generateFromImage = useCallback(() => {
     if (!imageUrl) { setAscii(''); return; }
@@ -96,10 +96,10 @@ export default function App() {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, iw, ih);
       ctx.drawImage(img, 0, 0, iw, ih);
-      setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, density)));
+      setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, contrast)));
     };
     img.src = imageUrl;
-  }, [imageUrl, cols, rows, density, charset]);
+  }, [imageUrl, cols, rows, contrast, charset]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -160,7 +160,7 @@ export default function App() {
             imageName={imageName} setImageName={setImageName}
             cols={cols} setCols={setCols}
             rows={rows} setRows={setRows}
-            density={density} setDensity={setDensity}
+            contrast={contrast} setContrast={setContrast}
             charsetKey={charsetKey} setCharsetKey={setCharsetKey}
             customCharset={customCharset} setCustomCharset={setCustomCharset}
             invert={invert} setInvert={setInvert}
