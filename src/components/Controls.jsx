@@ -9,6 +9,12 @@ const ASPECTS = [
   { key: 'FREE',      label: 'FREE'      },
 ];
 
+const CHARSET_KEYS = [
+  'GRADIENT', 'BLOCKS', 'DOTS',
+  'BINARY',   'DETAILED', 'CUSTOM',
+  'FORMAL',   'AUDIT',    'THEOREM',
+];
+
 export default function Controls({
   theme,
   mode, setMode,
@@ -203,7 +209,7 @@ export default function Controls({
 
       <Section label="04 // CHARSET" muted={MUTED}>
         <div className="grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
-          {Object.keys(CHAR_SETS).concat(['CUSTOM']).map((k, i) => (
+          {CHARSET_KEYS.map((k, i) => (
             <button
               key={k}
               onClick={() => setCharsetKey(k)}

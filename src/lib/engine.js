@@ -4,6 +4,9 @@ export const CHAR_SETS = {
   DOTS:     '●•∙· ',
   BINARY:   '10 ',
   DETAILED: '$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,"^`\'. ',
+  FORMAL:   '∀∃∈⊆⊇∧∨¬⇒□ ',
+  AUDIT:    '{}[]()<>=!&|+-*/# ',
+  THEOREM:  '∎■□▪▫· ',
 };
 
 export const TEXT_STYLES = [
