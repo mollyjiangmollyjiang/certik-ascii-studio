@@ -20,8 +20,6 @@ export default function Controls({
   charsetKey, setCharsetKey,
   customCharset, setCustomCharset,
   invert, setInvert,
-  binaryMode, setBinaryMode,
-  threshold, setThreshold,
   foreground, setForeground,
   background, setBackground,
 }) {
@@ -44,7 +42,7 @@ export default function Controls({
   };
 
   return (
-    <aside className="p-5 md:p-6" style={{ borderRight: `1px solid ${HAIR}`, background: DEEP }}>
+    <aside className="p-5 md:p-6 md:h-full md:overflow-y-auto" style={{ borderRight: `1px solid ${HAIR}`, background: DEEP }}>
       <Section label="01 // MODE" muted={MUTED}>
         <div className="grid grid-cols-2 gap-0" style={{ border: `1px solid ${HAIR}` }}>
           <Toggle active={mode === 'text'} onClick={() => setMode('text')} ink={INK} type={TYPE} hair={HAIR}>
@@ -77,7 +75,7 @@ export default function Controls({
             </div>
             <div className="mt-3">
               <div className="text-[10px] tracking-[0.2em] mb-2" style={{ color: MUTED }}>STYLE</div>
-              <div className="grid grid-cols-2 gap-0" style={{ border: `1px solid ${HAIR}` }}>
+              <div className="grid grid-cols-4 gap-0" style={{ border: `1px solid ${HAIR}` }}>
                 {TEXT_STYLES.map((s, i) => (
                   <button
                     key={s.key}
@@ -85,10 +83,9 @@ export default function Controls({
                     style={{
                       background: textStyle === s.key ? TYPE : 'transparent',
                       color: textStyle === s.key ? INK : TYPE,
-                      borderRight: i % 2 === 0 ? `1px solid ${HAIR}` : 'none',
-                      borderTop: i >= 2 ? `1px solid ${HAIR}` : 'none',
+                      borderRight: i < TEXT_STYLES.length - 1 ? `1px solid ${HAIR}` : 'none',
                     }}
-                    className="px-3 py-2.5 text-[10px] tracking-[0.16em] font-semibold transition-colors hover:bg-white/5"
+                    className="px-2 py-2.5 text-[10px] tracking-[0.16em] font-semibold transition-colors hover:bg-white/5"
                   >
                     {s.label}
                   </button>
@@ -229,47 +226,6 @@ export default function Controls({
           <input type="checkbox" checked={invert} onChange={(e) => setInvert(e.target.checked)} className="hidden" />
           <span className="text-[11px] tracking-[0.12em] font-medium">INVERT TONAL MAPPING</span>
         </label>
-
-        <label className="flex items-center gap-3 cursor-pointer select-none mt-3">
-          <div
-            style={{
-              width: 16, height: 16,
-              border: `1px solid ${binaryMode ? BLUE : HAIR}`,
-              background: binaryMode ? BLUE : 'transparent',
-              display: 'grid', placeItems: 'center',
-              flexShrink: 0,
-            }}
-          >
-            {binaryMode && <Check size={10} color={TYPE} strokeWidth={3} />}
-          </div>
-          <input type="checkbox" checked={binaryMode} onChange={(e) => setBinaryMode(e.target.checked)} className="hidden" />
-          <div>
-            <div className="text-[11px] tracking-[0.12em] font-medium">BINARY MODE</div>
-            <div className="text-[10px] mt-0.5" style={{ color: MUTED }}>Two-tone rendering with threshold control</div>
-          </div>
-        </label>
-
-        {binaryMode && (
-          <div className="mt-3">
-            <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: MUTED }}>
-              <span>THRESHOLD</span>
-              <span style={{ color: TYPE }}>{threshold.toFixed(2)}</span>
-            </div>
-            <input
-              type="range"
-              min={0}
-              max={1}
-              step={0.01}
-              value={threshold}
-              onChange={(e) => setThreshold(+e.target.value)}
-              className="w-full"
-              style={{ accentColor: BLUE }}
-            />
-            <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
-              <span>0.00</span><span>0.50</span><span>1.00</span>
-            </div>
-          </div>
-        )}
       </Section>
 
       <Section label="06 // COLORS" muted={MUTED}>
@@ -279,10 +235,6 @@ export default function Controls({
         </div>
       </Section>
 
-      <div className="mt-8 pt-4 text-[10px] leading-[1.7] tracking-[0.08em]" style={{ borderTop: `1px solid ${HAIR}`, color: MUTED }}>
-        <span style={{ color: BLUE }}>※</span> FOR LOGOS, TRY BLOCKS @ W:60–100.<br/>
-        <span style={{ color: BLUE }}>※</span> FOR READMES, GRADIENT @ W:80.
-      </div>
     </aside>
   );
 }

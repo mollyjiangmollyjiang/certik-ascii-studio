@@ -18,7 +18,7 @@ export const TEXT_STYLES = [
 
 export const SCRAMBLE_POOL = '@#*+=-:.01█▓▒░█▓▒░·•●';
 
-export function canvasToAscii(canvas, widthChars, charset, fixedHeight, binaryMode = false, threshold = 0.5) {
+export function canvasToAscii(canvas, widthChars, charset, fixedHeight) {
   const ctx = canvas.getContext('2d');
   const srcW = canvas.width;
   const srcH = canvas.height;
@@ -32,7 +32,6 @@ export function canvasToAscii(canvas, widthChars, charset, fixedHeight, binaryMo
     heightChars = Math.max(1, Math.floor(srcH / cellH));
   }
   const img = ctx.getImageData(0, 0, srcW, srcH).data;
-  const lastIdx = charset.length - 1;
 
   let result = '';
   for (let cy = 0; cy < heightChars; cy++) {
@@ -52,12 +51,7 @@ export function canvasToAscii(canvas, widthChars, charset, fixedHeight, binaryMo
         }
       }
       const avg = count > 0 ? sum / count : 1;
-      let idx;
-      if (binaryMode) {
-        idx = avg < threshold ? 0 : lastIdx;
-      } else {
-        idx = Math.min(lastIdx, Math.max(0, Math.floor(avg * charset.length)));
-      }
+      const idx = Math.min(charset.length - 1, Math.max(0, Math.floor(avg * charset.length)));
       result += charset[idx];
     }
     result += '\n';

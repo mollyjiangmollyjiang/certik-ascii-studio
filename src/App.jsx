@@ -26,8 +26,6 @@ export default function App() {
   const [charsetKey, setCharsetKey] = useState('BLOCKS');
   const [customCharset, setCustomCharset] = useState('');
   const [invert, setInvert] = useState(false);
-  const [binaryMode, setBinaryMode] = useState(false);
-  const [threshold, setThreshold] = useState(0.5);
   const [previewSize, setPreviewSize] = useState(12);
   const [foreground, setForeground] = useState('#F5F5F0');
   const [background, setBackground] = useState('#0A0B0D');
@@ -76,8 +74,8 @@ export default function App() {
       ctx.fillStyle = 'black';
       ctx.fillText(text, w / 2, h / 2);
     }
-    setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, binaryMode, threshold)));
-  }, [text, textStyle, cols, rows, charset, binaryMode, threshold]);
+    setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows)));
+  }, [text, textStyle, cols, rows, charset]);
 
   const generateFromImage = useCallback(() => {
     if (!imageUrl) { setAscii(''); return; }
@@ -98,10 +96,10 @@ export default function App() {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, iw, ih);
       ctx.drawImage(img, 0, 0, iw, ih);
-      setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, binaryMode, threshold)));
+      setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows)));
     };
     img.src = imageUrl;
-  }, [imageUrl, cols, rows, charset, binaryMode, threshold]);
+  }, [imageUrl, cols, rows, charset]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -149,29 +147,8 @@ export default function App() {
           rows={rows}
         />
 
-        <header className="mb-5">
-          <div className="text-[10px] tracking-[0.28em] mb-3 flex items-center gap-2" style={{ color: THEME.MUTED }}>
-            <span style={{ color: THEME.BLUE }}>◆</span>
-            <span>CERTIK // INTERNAL BRANDING ENGINE</span>
-          </div>
-          <h1
-            className="leading-[0.9]"
-            style={{
-              fontFamily: '"JetBrains Mono", monospace',
-              fontWeight: 800,
-              fontSize: 'clamp(20px, 2.5vw, 36px)',
-              letterSpacing: '-0.045em',
-            }}
-          >
-            ASCII<span style={{ color: THEME.BLUE }}>.</span>CONV<span style={{ color: THEME.BLUE, animation: 'blink 1s steps(2) infinite' }}>_</span>
-          </h1>
-          <p className="mt-3 text-[13px]" style={{ color: THEME.MUTED }}>
-            Text and image → character grids. For READMEs, CLI, socials, print.
-          </p>
-        </header>
-
         <div
-          className="grid md:grid-cols-[340px_1fr] gap-0"
+          className="grid md:grid-cols-[340px_1fr] gap-0 md:h-[calc(100vh-140px)]"
           style={{ border: `1px solid ${THEME.HAIR}`, background: THEME.DEEP }}
         >
           <Controls
@@ -186,8 +163,6 @@ export default function App() {
             charsetKey={charsetKey} setCharsetKey={setCharsetKey}
             customCharset={customCharset} setCustomCharset={setCustomCharset}
             invert={invert} setInvert={setInvert}
-            binaryMode={binaryMode} setBinaryMode={setBinaryMode}
-            threshold={threshold} setThreshold={setThreshold}
             foreground={foreground} setForeground={setForeground}
             background={background} setBackground={setBackground}
           />

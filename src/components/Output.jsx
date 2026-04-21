@@ -64,7 +64,7 @@ export default function Output({
   };
 
   return (
-    <section className="flex flex-col" style={{ background: INK, minHeight: 600 }}>
+    <section className="flex flex-col min-h-[600px] md:min-h-0" style={{ background: INK }}>
       <div
         className="flex items-center justify-between px-5 py-3"
         style={{ borderBottom: `1px solid ${HAIR}`, background: DEEP }}
