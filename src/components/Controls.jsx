@@ -17,6 +17,7 @@ export default function Controls({
   imageName, setImageName,
   cols, setCols,
   rows, setRows,
+  density, setDensity,
   charsetKey, setCharsetKey,
   customCharset, setCustomCharset,
   invert, setInvert,
@@ -176,7 +177,23 @@ export default function Controls({
         </div>
       </Section>
 
-      <Section label="04 // CHARSET" muted={MUTED}>
+      <Section label={`04 // DENSITY · ${density.toFixed(2)}`} muted={MUTED}>
+        <input
+          type="range"
+          min={0}
+          max={1}
+          step={0.01}
+          value={density}
+          onChange={(e) => setDensity(+e.target.value)}
+          className="w-full"
+          style={{ accentColor: BLUE }}
+        />
+        <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
+          <span>SPARSE</span><span>LINEAR</span><span>DENSE</span>
+        </div>
+      </Section>
+
+      <Section label="05 // CHARSET" muted={MUTED}>
         <div className="grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
           {CHARSET_KEYS.map((k, i) => (
             <button
@@ -211,7 +228,7 @@ export default function Controls({
         </div>
       </Section>
 
-      <Section label="05 // OPTIONS" muted={MUTED}>
+      <Section label="06 // OPTIONS" muted={MUTED}>
         <label className="flex items-center gap-3 cursor-pointer select-none">
           <div
             style={{
@@ -228,7 +245,7 @@ export default function Controls({
         </label>
       </Section>
 
-      <Section label="06 // COLORS" muted={MUTED}>
+      <Section label="07 // COLORS" muted={MUTED}>
         <div className="grid grid-cols-2 gap-2">
           <ColorField label="FG" value={foreground} onChange={setForeground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
           <ColorField label="BG" value={background} onChange={setBackground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
