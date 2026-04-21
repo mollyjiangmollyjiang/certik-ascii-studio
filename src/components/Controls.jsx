@@ -21,6 +21,7 @@ export default function Controls({
   charsetKey, setCharsetKey,
   customCharset, setCustomCharset,
   invert, setInvert,
+  enhanceContrast, setEnhanceContrast,
   foreground, setForeground,
   background, setBackground,
 }) {
@@ -213,6 +214,27 @@ export default function Controls({
       </Section>
 
       <Section label="06 // OPTIONS" muted={MUTED}>
+        {mode === 'image' && (
+          <label className="flex items-start gap-3 cursor-pointer select-none mb-3">
+            <div
+              style={{
+                width: 16, height: 16,
+                border: `1px solid ${enhanceContrast ? BLUE : HAIR}`,
+                background: enhanceContrast ? BLUE : 'transparent',
+                display: 'grid', placeItems: 'center',
+                flexShrink: 0,
+                marginTop: 1,
+              }}
+            >
+              {enhanceContrast && <Check size={10} color={TYPE} strokeWidth={3} />}
+            </div>
+            <input type="checkbox" checked={enhanceContrast} onChange={(e) => setEnhanceContrast(e.target.checked)} className="hidden" />
+            <div>
+              <div className="text-[11px] tracking-[0.12em] font-medium">enhance contrast</div>
+              <div className="text-[10px] mt-0.5" style={{ color: MUTED }}>auto-adjust levels and contrast for cleaner output</div>
+            </div>
+          </label>
+        )}
         <label className="flex items-center gap-3 cursor-pointer select-none">
           <div
             style={{

@@ -19,7 +19,63 @@ export const TEXT_STYLES = [
 
 export const SCRAMBLE_POOL = '@#*+=-:.01█▓▒░█▓▒░·•●';
 
-export function canvasToAscii(canvas, widthChars, charset, fixedHeight) {
+function toGrayscale(imageData) {
+  const { data, width, height } = imageData;
+  const pixels = new Float32Array(width * height);
+  for (let i = 0, j = 0; i < data.length; i += 4, j++) {
+    const a = data[i + 3] / 255;
+    const r = data[i]     / 255;
+    const g = data[i + 1] / 255;
+    const b = data[i + 2] / 255;
+    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+    // composite over white so transparent pixels read as background
+    pixels[j] = lum * a + (1 - a);
+  }
+  return pixels;
+}
+
+function applyAutoLevels(pixels) {
+  const BUCKETS = 256;
+  const hist = new Uint32Array(BUCKETS);
+  for (let i = 0; i < pixels.length; i++) {
+    const b = Math.min(BUCKETS - 1, Math.max(0, Math.floor(pixels[i] * BUCKETS)));
+    hist[b]++;
+  }
+  const total = pixels.length;
+  const loThresh = total * 0.02;
+  const hiThresh = total * 0.98;
+  let lo = 0, hi = BUCKETS - 1, cum = 0;
+  for (let i = 0; i < BUCKETS; i++) {
+    cum += hist[i];
+    if (cum >= loThresh) { lo = i; break; }
+  }
+  cum = 0;
+  for (let i = 0; i < BUCKETS; i++) {
+    cum += hist[i];
+    if (cum >= hiThresh) { hi = i; break; }
+  }
+  const loVal = lo / BUCKETS;
+  const hiVal = hi / BUCKETS;
+  const range = hiVal - loVal;
+  if (range < 0.01) return pixels;
+  const out = new Float32Array(pixels.length);
+  for (let i = 0; i < pixels.length; i++) {
+    const s = (pixels[i] - loVal) / range;
+    out[i] = s < 0 ? 0 : (s > 1 ? 1 : s);
+  }
+  return out;
+}
+
+function applySCurve(pixels) {
+  const out = new Float32Array(pixels.length);
+  for (let i = 0; i < pixels.length; i++) {
+    const x = pixels[i];
+    out[i] = x * x * (3 - 2 * x);
+  }
+  return out;
+}
+
+export function canvasToAscii(canvas, widthChars, charset, fixedHeight, enhanceContrast = true) {
   const ctx = canvas.getContext('2d');
   const srcW = canvas.width;
   const srcH = canvas.height;
@@ -32,9 +88,13 @@ export function canvasToAscii(canvas, widthChars, charset, fixedHeight) {
     cellH = cellW * 2;
     heightChars = Math.max(1, Math.floor(srcH / cellH));
   }
-  const img = ctx.getImageData(0, 0, srcW, srcH).data;
-  const lastIdx = charset.length - 1;
 
+  const imageData = ctx.getImageData(0, 0, srcW, srcH);
+  let pixels = toGrayscale(imageData);
+  pixels = applyAutoLevels(pixels);
+  if (enhanceContrast) pixels = applySCurve(pixels);
+
+  const lastIdx = charset.length - 1;
   let result = '';
   for (let cy = 0; cy < heightChars; cy++) {
     for (let cx = 0; cx < widthChars; cx++) {
@@ -44,11 +104,9 @@ export function canvasToAscii(canvas, widthChars, charset, fixedHeight) {
       const x1 = Math.min(srcW, Math.floor((cx + 1) * cellW));
       const y1 = Math.min(srcH, Math.floor((cy + 1) * cellH));
       for (let y = y0; y < y1; y++) {
+        const rowOffset = y * srcW;
         for (let x = x0; x < x1; x++) {
-          const i = (y * srcW + x) * 4;
-          const a = img[i + 3] / 255;
-          const b = (img[i] * 0.299 + img[i + 1] * 0.587 + img[i + 2] * 0.114) / 255;
-          sum += b * a + (1 - a);
+          sum += pixels[rowOffset + x];
           count++;
         }
       }

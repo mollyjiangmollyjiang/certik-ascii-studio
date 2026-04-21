@@ -29,26 +29,33 @@ export default function Output({
   const handleDownloadSvg = () => {
     if (!ascii) return;
     const lines = ascii.split('\n');
-    const fontSize = 12;
+    const fontSize = 14;
     const measure = document.createElement('canvas').getContext('2d');
     measure.font = `500 ${fontSize}px ${MONO_STACK}`;
     const charWidth = measure.measureText('M').width;
     const lineHeight = fontSize * 1.15;
     const padding = fontSize;
-    const maxLen = Math.max(...lines.map(l => l.length));
+    const maxLen = Math.max(...lines.map(l => l.length), 1);
     const svgWidth = Math.ceil(maxLen * charWidth + padding * 2);
     const svgHeight = Math.ceil(lines.length * lineHeight + padding * 2);
     const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
     let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgWidth}" height="${svgHeight}" viewBox="0 0 ${svgWidth} ${svgHeight}">`;
     svg += `<rect width="${svgWidth}" height="${svgHeight}" fill="${background}"/>`;
+    // One <g> per non-space glyph: transparent <rect> hitbox + <text>.
+    // Figma treats each <g> as an independent group, so each character is
+    // selectable/editable on its own in Figma.
     lines.forEach((line, rowIdx) => {
-      const y = padding + (rowIdx + 1) * lineHeight - lineHeight * 0.25;
+      const textY = padding + (rowIdx + 1) * lineHeight - lineHeight * 0.25;
+      const rectY = padding + rowIdx * lineHeight;
       for (let colIdx = 0; colIdx < line.length; colIdx++) {
         const ch = line[colIdx];
         if (ch === ' ') continue;
         const x = padding + colIdx * charWidth;
-        svg += `<text x="${x}" y="${y}" font-family='${MONO_STACK}' font-size="${fontSize}" fill="${foreground}" xml:space="preserve">${escape(ch)}</text>`;
+        svg += `<g>`;
+        svg += `<rect x="${x}" y="${rectY}" width="${charWidth}" height="${lineHeight}" fill="transparent"/>`;
+        svg += `<text x="${x}" y="${textY}" font-family='${MONO_STACK}' font-size="${fontSize}" fill="${foreground}" xml:space="preserve">${escape(ch)}</text>`;
+        svg += `</g>`;
       }
     });
     svg += '</svg>';
