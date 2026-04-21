@@ -2,13 +2,6 @@ import { useRef, useState } from 'react';
 import { Type, ImageIcon, Upload, Check, X } from 'lucide-react';
 import { CHAR_SETS, TEXT_STYLES } from '../lib/engine';
 
-const ASPECTS = [
-  { key: 'SQUARE',    label: 'SQUARE'    },
-  { key: 'LANDSCAPE', label: 'LANDSCAPE' },
-  { key: 'PORTRAIT',  label: 'PORTRAIT'  },
-  { key: 'FREE',      label: 'FREE'      },
-];
-
 const CHARSET_KEYS = [
   'GRADIENT', 'BLOCKS', 'DOTS',
   'BINARY',   'DETAILED', 'CUSTOM',
@@ -22,12 +15,13 @@ export default function Controls({
   textStyle, setTextStyle,
   imageUrl, setImageUrl,
   imageName, setImageName,
-  aspect, onAspectChange,
-  cols, onColsChange,
+  cols, setCols,
   rows, setRows,
   charsetKey, setCharsetKey,
   customCharset, setCustomCharset,
   invert, setInvert,
+  foreground, setForeground,
+  background, setBackground,
 }) {
   const { INK, DEEP, HAIR, TYPE, MUTED, BLUE } = theme;
   const fileInputRef = useRef(null);
@@ -146,25 +140,7 @@ export default function Controls({
       </Section>
 
       <Section label={`03 // GRID · ${cols}×${rows}`} muted={MUTED}>
-        <div className="grid grid-cols-2 gap-0" style={{ border: `1px solid ${HAIR}` }}>
-          {ASPECTS.map((a, i) => (
-            <button
-              key={a.key}
-              onClick={() => onAspectChange(a.key)}
-              style={{
-                background: aspect === a.key ? TYPE : 'transparent',
-                color: aspect === a.key ? INK : TYPE,
-                borderRight: i % 2 === 0 ? `1px solid ${HAIR}` : 'none',
-                borderTop: i >= 2 ? `1px solid ${HAIR}` : 'none',
-              }}
-              className="px-3 py-2.5 text-[10px] tracking-[0.16em] font-semibold transition-colors hover:bg-white/5"
-            >
-              {a.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-3">
+        <div>
           <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: MUTED }}>
             <span>COLS</span><span style={{ color: TYPE }}>{cols}</span>
           </div>
@@ -173,7 +149,7 @@ export default function Controls({
             min={20}
             max={160}
             value={cols}
-            onChange={(e) => onColsChange(+e.target.value)}
+            onChange={(e) => setCols(+e.target.value)}
             className="w-full"
             style={{ accentColor: BLUE }}
           />
@@ -183,23 +159,17 @@ export default function Controls({
         </div>
 
         <div className="mt-3">
-          <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: aspect === 'FREE' ? MUTED : '#3a3e45' }}>
-            <span>ROWS{aspect !== 'FREE' && ' · LOCKED'}</span>
-            <span style={{ color: aspect === 'FREE' ? TYPE : MUTED }}>{rows}</span>
+          <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: MUTED }}>
+            <span>ROWS</span><span style={{ color: TYPE }}>{rows}</span>
           </div>
           <input
             type="range"
             min={20}
             max={120}
             value={rows}
-            disabled={aspect !== 'FREE'}
             onChange={(e) => setRows(+e.target.value)}
             className="w-full"
-            style={{
-              accentColor: BLUE,
-              opacity: aspect === 'FREE' ? 1 : 0.4,
-              cursor: aspect === 'FREE' ? 'pointer' : 'not-allowed',
-            }}
+            style={{ accentColor: BLUE }}
           />
           <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
             <span>20</span><span>70</span><span>120</span>
@@ -259,6 +229,13 @@ export default function Controls({
         </label>
       </Section>
 
+      <Section label="06 // COLORS" muted={MUTED}>
+        <div className="grid grid-cols-2 gap-2">
+          <ColorField label="FG" value={foreground} onChange={setForeground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
+          <ColorField label="BG" value={background} onChange={setBackground} ink={INK} hair={HAIR} type={TYPE} muted={MUTED} />
+        </div>
+      </Section>
+
       <div className="mt-8 pt-4 text-[10px] leading-[1.7] tracking-[0.08em]" style={{ borderTop: `1px solid ${HAIR}`, color: MUTED }}>
         <span style={{ color: BLUE }}>※</span> FOR LOGOS, TRY BLOCKS @ W:60–100.<br/>
         <span style={{ color: BLUE }}>※</span> FOR READMES, GRADIENT @ W:80.
@@ -289,5 +266,45 @@ function Toggle({ active, onClick, children, ink, type, hair, borderLeft }) {
     >
       {children}
     </button>
+  );
+}
+
+function ColorField({ label, value, onChange, ink, hair, type, muted }) {
+  return (
+    <div>
+      <div className="text-[10px] tracking-[0.2em] mb-1.5" style={{ color: muted }}>{label}</div>
+      <div className="flex items-center gap-2">
+        <label
+          style={{
+            position: 'relative',
+            width: 32, height: 32,
+            background: value,
+            border: `1px solid ${hair}`,
+            cursor: 'pointer',
+            flexShrink: 0,
+          }}
+        >
+          <input
+            type="color"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            style={{
+              position: 'absolute', inset: 0,
+              opacity: 0, width: '100%', height: '100%',
+              cursor: 'pointer', border: 'none', padding: 0,
+            }}
+          />
+        </label>
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          maxLength={7}
+          spellCheck={false}
+          style={{ background: ink, border: `1px solid ${hair}`, color: type }}
+          className="w-full px-2 py-1.5 text-[11px] uppercase outline-none focus:border-white/30"
+        />
+      </div>
+    </div>
   );
 }

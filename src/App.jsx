@@ -21,13 +21,14 @@ export default function App() {
   const [textStyle, setTextStyle] = useState('DISPLAY');
   const [imageUrl, setImageUrl] = useState(null);
   const [imageName, setImageName] = useState('');
-  const [aspect, setAspect] = useState('SQUARE');
   const [cols, setCols] = useState(72);
-  const [rows, setRows] = useState(36);
+  const [rows, setRows] = useState(30);
   const [charsetKey, setCharsetKey] = useState('BLOCKS');
   const [customCharset, setCustomCharset] = useState('');
   const [invert, setInvert] = useState(false);
   const [previewSize, setPreviewSize] = useState(12);
+  const [foreground, setForeground] = useState('#F5F5F0');
+  const [background, setBackground] = useState('#0A0B0D');
   const [ascii, setAscii] = useState('');
   const { displayed, isAnimating } = useScramble(ascii);
 
@@ -45,25 +46,6 @@ export default function App() {
       : CHAR_SETS[charsetKey];
     return invert ? base.split('').reverse().join('') : base;
   }, [charsetKey, customCharset, invert]);
-
-  const computeRows = (a, c) => {
-    switch (a) {
-      case 'SQUARE':    return Math.max(1, Math.round(c / 2));
-      case 'LANDSCAPE': return Math.max(1, Math.round((c * 9) / 16 / 2));
-      case 'PORTRAIT':  return Math.max(1, Math.round((c * 16) / 9 / 2));
-      default:          return null;
-    }
-  };
-
-  const handleAspectChange = (a) => {
-    setAspect(a);
-    if (a !== 'FREE') setRows(computeRows(a, cols));
-  };
-
-  const handleColsChange = (c) => {
-    setCols(c);
-    if (aspect !== 'FREE') setRows(computeRows(aspect, c));
-  };
 
   const generateFromText = useCallback(() => {
     if (!text) { setAscii(''); return; }
@@ -211,12 +193,13 @@ export default function App() {
             textStyle={textStyle} setTextStyle={setTextStyle}
             imageUrl={imageUrl} setImageUrl={setImageUrl}
             imageName={imageName} setImageName={setImageName}
-            aspect={aspect} onAspectChange={handleAspectChange}
-            cols={cols} onColsChange={handleColsChange}
+            cols={cols} setCols={setCols}
             rows={rows} setRows={setRows}
             charsetKey={charsetKey} setCharsetKey={setCharsetKey}
             customCharset={customCharset} setCustomCharset={setCustomCharset}
             invert={invert} setInvert={setInvert}
+            foreground={foreground} setForeground={setForeground}
+            background={background} setBackground={setBackground}
           />
           <Output
             theme={THEME}
@@ -227,6 +210,8 @@ export default function App() {
             filename={filename}
             previewSize={previewSize}
             setPreviewSize={setPreviewSize}
+            foreground={foreground}
+            background={background}
           />
         </div>
 
