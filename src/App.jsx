@@ -21,7 +21,9 @@ export default function App() {
   const [textStyle, setTextStyle] = useState('DISPLAY');
   const [imageUrl, setImageUrl] = useState(null);
   const [imageName, setImageName] = useState('');
-  const [width, setWidth] = useState(72);
+  const [aspect, setAspect] = useState('SQUARE');
+  const [cols, setCols] = useState(72);
+  const [rows, setRows] = useState(36);
   const [charsetKey, setCharsetKey] = useState('BLOCKS');
   const [customCharset, setCustomCharset] = useState('');
   const [invert, setInvert] = useState(false);
@@ -43,6 +45,25 @@ export default function App() {
       : CHAR_SETS[charsetKey];
     return invert ? base.split('').reverse().join('') : base;
   }, [charsetKey, customCharset, invert]);
+
+  const computeRows = (a, c) => {
+    switch (a) {
+      case 'SQUARE':    return Math.max(1, Math.round(c / 2));
+      case 'LANDSCAPE': return Math.max(1, Math.round((c * 9) / 16 / 2));
+      case 'PORTRAIT':  return Math.max(1, Math.round((c * 16) / 9 / 2));
+      default:          return null;
+    }
+  };
+
+  const handleAspectChange = (a) => {
+    setAspect(a);
+    if (a !== 'FREE') setRows(computeRows(a, cols));
+  };
+
+  const handleColsChange = (c) => {
+    setCols(c);
+    if (aspect !== 'FREE') setRows(computeRows(aspect, c));
+  };
 
   const generateFromText = useCallback(() => {
     if (!text) { setAscii(''); return; }
@@ -71,8 +92,8 @@ export default function App() {
       ctx.fillStyle = 'black';
       ctx.fillText(text, w / 2, h / 2);
     }
-    setAscii(trimAscii(canvasToAscii(canvas, width, charset)));
-  }, [text, textStyle, width, charset]);
+    setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows)));
+  }, [text, textStyle, cols, rows, charset]);
 
   const generateFromImage = useCallback(() => {
     if (!imageUrl) { setAscii(''); return; }
@@ -93,10 +114,10 @@ export default function App() {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, iw, ih);
       ctx.drawImage(img, 0, 0, iw, ih);
-      setAscii(trimAscii(canvasToAscii(canvas, width, charset)));
+      setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows)));
     };
     img.src = imageUrl;
-  }, [imageUrl, width, charset]);
+  }, [imageUrl, cols, rows, charset]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -140,7 +161,8 @@ export default function App() {
           theme={THEME}
           isAnimating={isAnimating}
           charsetKey={charsetKey}
-          width={width}
+          cols={cols}
+          rows={rows}
         />
 
         <header className="mb-5 flex items-end justify-between gap-6">
@@ -189,7 +211,9 @@ export default function App() {
             textStyle={textStyle} setTextStyle={setTextStyle}
             imageUrl={imageUrl} setImageUrl={setImageUrl}
             imageName={imageName} setImageName={setImageName}
-            width={width} setWidth={setWidth}
+            aspect={aspect} onAspectChange={handleAspectChange}
+            cols={cols} onColsChange={handleColsChange}
+            rows={rows} setRows={setRows}
             charsetKey={charsetKey} setCharsetKey={setCharsetKey}
             customCharset={customCharset} setCustomCharset={setCustomCharset}
             invert={invert} setInvert={setInvert}

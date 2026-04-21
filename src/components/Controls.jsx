@@ -2,6 +2,13 @@ import { useRef, useState } from 'react';
 import { Type, ImageIcon, Upload, Check, X } from 'lucide-react';
 import { CHAR_SETS, TEXT_STYLES } from '../lib/engine';
 
+const ASPECTS = [
+  { key: 'SQUARE',    label: 'SQUARE'    },
+  { key: 'LANDSCAPE', label: 'LANDSCAPE' },
+  { key: 'PORTRAIT',  label: 'PORTRAIT'  },
+  { key: 'FREE',      label: 'FREE'      },
+];
+
 export default function Controls({
   theme,
   mode, setMode,
@@ -9,7 +16,9 @@ export default function Controls({
   textStyle, setTextStyle,
   imageUrl, setImageUrl,
   imageName, setImageName,
-  width, setWidth,
+  aspect, onAspectChange,
+  cols, onColsChange,
+  rows, setRows,
   charsetKey, setCharsetKey,
   customCharset, setCustomCharset,
   invert, setInvert,
@@ -130,18 +139,65 @@ export default function Controls({
         )}
       </Section>
 
-      <Section label={`03 // WIDTH · ${width} COLS`} muted={MUTED}>
-        <input
-          type="range"
-          min={20}
-          max={160}
-          value={width}
-          onChange={(e) => setWidth(+e.target.value)}
-          className="w-full"
-          style={{ accentColor: BLUE }}
-        />
-        <div className="flex justify-between text-[9px] mt-1 tracking-[0.15em]" style={{ color: MUTED }}>
-          <span>20</span><span>80</span><span>160</span>
+      <Section label={`03 // GRID · ${cols}×${rows}`} muted={MUTED}>
+        <div className="grid grid-cols-2 gap-0" style={{ border: `1px solid ${HAIR}` }}>
+          {ASPECTS.map((a, i) => (
+            <button
+              key={a.key}
+              onClick={() => onAspectChange(a.key)}
+              style={{
+                background: aspect === a.key ? TYPE : 'transparent',
+                color: aspect === a.key ? INK : TYPE,
+                borderRight: i % 2 === 0 ? `1px solid ${HAIR}` : 'none',
+                borderTop: i >= 2 ? `1px solid ${HAIR}` : 'none',
+              }}
+              className="px-3 py-2.5 text-[10px] tracking-[0.16em] font-semibold transition-colors hover:bg-white/5"
+            >
+              {a.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-3">
+          <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: MUTED }}>
+            <span>COLS</span><span style={{ color: TYPE }}>{cols}</span>
+          </div>
+          <input
+            type="range"
+            min={20}
+            max={160}
+            value={cols}
+            onChange={(e) => onColsChange(+e.target.value)}
+            className="w-full"
+            style={{ accentColor: BLUE }}
+          />
+          <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
+            <span>20</span><span>80</span><span>160</span>
+          </div>
+        </div>
+
+        <div className="mt-3">
+          <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: aspect === 'FREE' ? MUTED : '#3a3e45' }}>
+            <span>ROWS{aspect !== 'FREE' && ' · LOCKED'}</span>
+            <span style={{ color: aspect === 'FREE' ? TYPE : MUTED }}>{rows}</span>
+          </div>
+          <input
+            type="range"
+            min={20}
+            max={120}
+            value={rows}
+            disabled={aspect !== 'FREE'}
+            onChange={(e) => setRows(+e.target.value)}
+            className="w-full"
+            style={{
+              accentColor: BLUE,
+              opacity: aspect === 'FREE' ? 1 : 0.4,
+              cursor: aspect === 'FREE' ? 'pointer' : 'not-allowed',
+            }}
+          />
+          <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
+            <span>20</span><span>70</span><span>120</span>
+          </div>
         </div>
       </Section>
 
