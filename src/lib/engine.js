@@ -11,10 +11,9 @@ export const CHAR_SETS = {
 };
 
 export const TEXT_STYLES = [
-  { key: 'LOGO',    label: 'LOGO',    font: '"Orbitron", sans-serif',    weight: 900 },
-  { key: 'DISPLAY', label: 'DISPLAY', font: '"Satoshi", sans-serif',     weight: 900 },
-  { key: 'SERIF',   label: 'SERIF',   font: '"Playfair Display", serif', weight: 900 },
-  { key: 'OUTLINE', label: 'OUTLINE', font: '"Orbitron", sans-serif',    weight: 900, outline: true },
+  { key: 'DISPLAY',  label: 'DISPLAY',  font: '"Satoshi", sans-serif',     weight: 900 },
+  { key: 'ORBITRON', label: 'ORBITRON', font: '"Orbitron", sans-serif',    weight: 900 },
+  { key: 'SERIF',    label: 'SERIF',    font: '"Playfair Display", serif', weight: 900 },
 ];
 
 export const SCRAMBLE_POOL = '@#*+=-:.01█▓▒░█▓▒░·•●';

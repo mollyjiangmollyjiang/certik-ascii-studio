@@ -16,10 +16,12 @@ const THEME = {
   BLUE_DEEP: '#9C0033',
 };
 
+const getDefaultCols = (mode) => (mode === 'text' ? 152 : 72);
+
 export default function App() {
   const [mode, setMode] = useState('image');
   const [text, setText] = useState('CERTIK');
-  const [textStyle, setTextStyle] = useState('LOGO');
+  const [textStyle, setTextStyle] = useState('DISPLAY');
   const [isFirstVisit, setIsFirstVisit] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [imageName, setImageName] = useState('');
@@ -88,6 +90,15 @@ export default function App() {
       setLockedRatio(rows / cols);
     }
     setRatioLocked(!ratioLocked);
+  };
+
+  const handleModeChange = (newMode) => {
+    setMode(newMode);
+    const newCols = getDefaultCols(newMode);
+    const newRows = 30;
+    setCols(newCols);
+    setRows(newRows);
+    setLockedRatio(newRows / newCols);
   };
 
   const generateFromText = useCallback(() => {
@@ -197,7 +208,7 @@ export default function App() {
         >
           <Controls
             theme={THEME}
-            mode={mode} setMode={setMode}
+            mode={mode} setMode={handleModeChange}
             text={text} setText={setText}
             textStyle={textStyle} setTextStyle={setTextStyle}
             imageUrl={imageUrl} setImageUrl={setImageUrl}

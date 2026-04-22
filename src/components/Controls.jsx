@@ -79,7 +79,7 @@ export default function Controls({
             </div>
             <div className="mt-3">
               <div className="text-[10px] tracking-[0.2em] mb-2" style={{ color: MUTED }}>STYLE</div>
-              <div className="grid grid-cols-4 gap-0" style={{ border: `1px solid ${HAIR}` }}>
+              <div className="grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
                 {TEXT_STYLES.map((s, i) => (
                   <button
                     key={s.key}

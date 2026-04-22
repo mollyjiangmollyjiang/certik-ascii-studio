@@ -176,11 +176,12 @@ export default function Output({
           <pre
             style={{
               fontFamily: MONO_STACK,
-              fontSize: '12px',
+              fontSize: '10px',
               lineHeight: 1.08,
               color: foreground,
+              background: background,
               whiteSpace: 'pre',
-              letterSpacing: '0',
+              letterSpacing: mode === 'text' ? '0.05em' : '0',
               margin: 0,
               textShadow: isAnimating ? `0 0 8px rgba(199,0,66,0.4)` : 'none',
               transition: 'text-shadow 200ms',
