@@ -160,10 +160,15 @@ export default function Controls({
 
         <button
           onClick={() => setShowAllCharsets(!showAllCharsets)}
-          className="mt-1.5 text-[11px] hover:underline cursor-pointer"
-          style={{ color: MUTED, background: 'transparent', border: 'none', padding: 0 }}
+          className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 text-[10px] tracking-[0.15em] font-medium hover:bg-white/5 transition-colors cursor-pointer"
+          style={{
+            background: INK,
+            border: `1px solid ${HAIR}`,
+            color: TYPE,
+          }}
         >
-          {showAllCharsets ? 'fewer charsets ˅' : 'more charsets ›'}
+          <span style={{ color: BLUE }}>{showAllCharsets ? '▾' : '▸'}</span>
+          <span>{showAllCharsets ? 'fewer charsets' : 'more charsets'}</span>
         </button>
 
         <div
