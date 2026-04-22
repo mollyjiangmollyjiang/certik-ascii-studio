@@ -230,6 +230,7 @@ export default function App() {
             displayed={displayed}
             isAnimating={isAnimating}
             mode={mode}
+            charsetKey={charsetKey}
             filename={filename}
             foreground={foreground}
             background={background}

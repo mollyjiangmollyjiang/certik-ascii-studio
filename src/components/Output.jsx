@@ -2,12 +2,23 @@ import { useState } from 'react';
 import { Copy, Download, Check, Code } from 'lucide-react';
 import { MONO_STACK } from '../lib/fonts';
 
+// Per-charset letter-spacing in em. DOTS/BINARY override any mode default
+// so their characters don't visually clump horizontally (monospace cells
+// are tall, so ● adjacent to ● reads as a horizontal bar without space).
+function getSpacingEm(mode, charsetKey) {
+  if (charsetKey === 'DOTS')   return 0.3;
+  if (charsetKey === 'BINARY') return 0.2;
+  if (mode === 'text')         return 0.05;
+  return 0;
+}
+
 export default function Output({
   theme,
   ascii,
   displayed,
   isAnimating,
   mode,
+  charsetKey,
   filename,
   foreground,
   background,
@@ -20,6 +31,7 @@ export default function Output({
   const lineCount = ascii ? ascii.split('\n').length : 0;
   const colCount  = ascii ? Math.max(...ascii.split('\n').map(l => l.length)) : 0;
   const charCount = ascii.length;
+  const spacingEm = getSpacingEm(mode, charsetKey);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(ascii);
@@ -34,10 +46,11 @@ export default function Output({
     const measure = document.createElement('canvas').getContext('2d');
     measure.font = `500 ${fontSize}px ${MONO_STACK}`;
     const charWidth = measure.measureText('M').width;
+    const advance = charWidth + fontSize * spacingEm;
     const lineHeight = fontSize * 1.15;
     const padding = fontSize;
     const maxLen = Math.max(...lines.map(l => l.length), 1);
-    const svgWidth = Math.ceil(maxLen * charWidth + padding * 2);
+    const svgWidth = Math.ceil(maxLen * advance + padding * 2);
     const svgHeight = Math.ceil(lines.length * lineHeight + padding * 2);
     const escape = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
@@ -52,9 +65,9 @@ export default function Output({
       for (let colIdx = 0; colIdx < line.length; colIdx++) {
         const ch = line[colIdx];
         if (ch === ' ') continue;
-        const x = padding + colIdx * charWidth;
+        const x = padding + colIdx * advance;
         svg += `<g>`;
-        svg += `<rect x="${x}" y="${rectY}" width="${charWidth}" height="${lineHeight}" fill="transparent"/>`;
+        svg += `<rect x="${x}" y="${rectY}" width="${advance}" height="${lineHeight}" fill="transparent"/>`;
         svg += `<text x="${x}" y="${textY}" font-family='${MONO_STACK}' font-size="${fontSize}" fill="${foreground}" xml:space="preserve">${escape(ch)}</text>`;
         svg += `</g>`;
       }
@@ -82,9 +95,10 @@ export default function Output({
     const ctx = canvas.getContext('2d');
     ctx.font = `500 ${fontSize}px ${MONO_STACK}`;
     const charWidth = ctx.measureText('M').width;
+    const advance = charWidth + fontSize * spacingEm;
     const maxLen = Math.max(...lines.map(l => l.length));
     const pad = 56;
-    const w = Math.ceil(charWidth * maxLen) + pad * 2;
+    const w = Math.ceil(advance * maxLen) + pad * 2;
     const h = Math.ceil(lineHeight * lines.length) + pad * 2;
     canvas.width = w;
     canvas.height = h;
@@ -93,7 +107,16 @@ export default function Output({
     ctx.fillStyle = foreground;
     ctx.font = `500 ${fontSize}px ${MONO_STACK}`;
     ctx.textBaseline = 'top';
-    lines.forEach((line, i) => ctx.fillText(line, pad, pad + i * lineHeight));
+    // Draw char-by-char so spacing matches the <pre> preview and the SVG
+    // export, which also use `advance` per column.
+    lines.forEach((line, rowIdx) => {
+      const y = pad + rowIdx * lineHeight;
+      for (let colIdx = 0; colIdx < line.length; colIdx++) {
+        const ch = line[colIdx];
+        if (ch === ' ') continue;
+        ctx.fillText(ch, pad + colIdx * advance, y);
+      }
+    });
     const a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
     a.download = `${filename}.png`;
@@ -181,7 +204,7 @@ export default function Output({
               color: foreground,
               background: background,
               whiteSpace: 'pre',
-              letterSpacing: mode === 'text' ? '0.05em' : '0',
+              letterSpacing: `${spacingEm}em`,
               margin: 0,
               textShadow: isAnimating ? `0 0 8px rgba(199,0,66,0.4)` : 'none',
               transition: 'text-shadow 200ms',
