@@ -104,7 +104,7 @@ export default function Output({
   };
 
   return (
-    <section className="flex flex-col min-h-[600px] md:min-h-0" style={{ background: INK }}>
+    <section className="flex flex-col min-h-[600px] md:min-h-0 min-w-0 overflow-hidden" style={{ background: INK }}>
       <div
         className="flex items-center justify-between gap-3 sm:gap-4 px-5 py-3 flex-wrap"
         style={{ borderBottom: `1px solid ${HAIR}`, background: DEEP }}

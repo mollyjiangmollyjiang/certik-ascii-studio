@@ -175,7 +175,7 @@ export default function App() {
         fontFamily: UI_STACK,
         minHeight: '100vh',
       }}
-      className="w-full"
+      className="w-full overflow-x-hidden"
     >
       <div
         style={{
