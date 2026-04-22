@@ -68,12 +68,12 @@ export default function Controls({
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 maxLength={24}
-                placeholder="your text"
+                placeholder="type something_"
                 style={{
                   background: INK, border: `1px solid ${HAIR}`, color: TYPE,
                   fontFamily: 'inherit', letterSpacing: '0.06em',
                 }}
-                className="w-full pl-8 pr-3 py-2.5 text-sm font-semibold uppercase outline-none focus:border-white/30"
+                className="w-full pl-8 pr-3 py-2.5 text-sm font-semibold outline-none focus:border-white/30"
               />
             </div>
             <div className="mt-3">
