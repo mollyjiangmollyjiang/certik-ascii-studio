@@ -1,13 +1,15 @@
 import { useClock } from '../lib/clock';
+import { MONO_STACK } from '../lib/fonts';
 
-export function TopStatusBar({ theme, isAnimating, charsetKey, cols, rows }) {
+export function TopStatusBar({ theme, isAnimating, isFirstVisit, charsetKey, cols, rows }) {
   const { DEEP, HAIR, TYPE, MUTED, BLUE } = theme;
   const clock = useClock();
+  const statusLabel = isFirstVisit ? 'welcome ✦' : (isAnimating ? 'weaving' : 'READY');
 
   return (
     <div
       className="flex items-center justify-between text-[10px] tracking-[0.22em] mb-4 px-4 py-2.5"
-      style={{ background: DEEP, border: `1px solid ${HAIR}`, color: MUTED }}
+      style={{ background: DEEP, border: `1px solid ${HAIR}`, color: MUTED, fontFamily: MONO_STACK }}
     >
       <div className="flex items-center gap-3 flex-wrap">
         <span style={{ color: BLUE }}>◆</span>
@@ -20,11 +22,19 @@ export function TopStatusBar({ theme, isAnimating, charsetKey, cols, rows }) {
             width: 8, height: 8, borderRadius: '50%',
             background: isAnimating ? BLUE : '#22C55E',
             boxShadow: `0 0 10px ${isAnimating ? BLUE : '#22C55E'}`,
-            animation: 'pulse 1.6s ease-in-out infinite',
+            animation: 'pulse 2.4s ease-in-out infinite',
             flexShrink: 0,
           }}
         />
-        <span style={{ color: TYPE }}>{isAnimating ? 'RESOLVING' : 'READY'}</span>
+        <span
+          key={statusLabel}
+          style={{
+            color: TYPE,
+            animation: 'fadeIn 0.4s ease',
+          }}
+        >
+          {statusLabel}
+        </span>
         <span>//</span>
         <span>ASCII-CONV v1.0</span>
       </div>
@@ -47,7 +57,7 @@ export function BottomStatusBar({ theme }) {
   return (
     <div
       className="mt-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-2 text-[10px] tracking-[0.22em] px-4 py-2.5"
-      style={{ background: DEEP, border: `1px solid ${HAIR}`, color: MUTED }}
+      style={{ background: DEEP, border: `1px solid ${HAIR}`, color: MUTED, fontFamily: MONO_STACK }}
     >
       <div className="flex gap-3">
         <span>ENGINE:</span>

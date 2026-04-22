@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CHAR_SETS, TEXT_STYLES, canvasToAscii, trimAscii } from './lib/engine';
 import { useScramble } from './lib/scramble';
+import { UI_STACK } from './lib/fonts';
 import Controls from './components/Controls';
 import Output from './components/Output';
 import { TopStatusBar, BottomStatusBar } from './components/StatusBar';
@@ -15,36 +16,90 @@ const THEME = {
   BLUE_DEEP: '#9C0033',
 };
 
+const getDefaultCols = (mode) => (mode === 'text' ? 152 : 72);
+
 export default function App() {
-  const [mode, setMode] = useState('text');
+  const [mode, setMode] = useState('image');
   const [text, setText] = useState('CERTIK');
   const [textStyle, setTextStyle] = useState('DISPLAY');
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
   const [imageName, setImageName] = useState('');
   const [cols, setCols] = useState(72);
   const [rows, setRows] = useState(30);
-  const [charsetKey, setCharsetKey] = useState('BLOCKS');
-  const [customCharset, setCustomCharset] = useState('');
+  const [ratioLocked, setRatioLocked] = useState(true);
+  const [lockedRatio, setLockedRatio] = useState(30 / 72);
+  const [charsetKey, setCharsetKey] = useState('MATH');
   const [invert, setInvert] = useState(false);
+  const [enhanceContrast, setEnhanceContrast] = useState(true);
+  const [isolateSubject, setIsolateSubject] = useState(false);
+  const [subjectThreshold, setSubjectThreshold] = useState(0.65);
   const [foreground, setForeground] = useState('#F5F5F0');
   const [background, setBackground] = useState('#0A0B0D');
   const [ascii, setAscii] = useState('');
   const { displayed, isAnimating } = useScramble(ascii);
 
   useEffect(() => {
-    const link = document.createElement('link');
-    link.href = 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Archivo+Black&family=Playfair+Display:ital,wght@0,900;1,900&family=Roboto+Slab:wght@900&display=swap';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-    return () => { try { document.head.removeChild(link); } catch { /* noop */ } };
+    const google = document.createElement('link');
+    google.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&family=Playfair+Display:ital,wght@0,900;1,900&display=swap';
+    google.rel = 'stylesheet';
+    document.head.appendChild(google);
+
+    const satoshi = document.createElement('link');
+    satoshi.href = 'https://api.fontshare.com/v2/css?f[]=satoshi@900&display=swap';
+    satoshi.rel = 'stylesheet';
+    document.head.appendChild(satoshi);
+
+    return () => {
+      try { document.head.removeChild(google); } catch { /* noop */ }
+      try { document.head.removeChild(satoshi); } catch { /* noop */ }
+    };
   }, []);
 
-  const charset = useMemo(() => {
-    const base = charsetKey === 'CUSTOM'
-      ? (customCharset.length >= 2 ? customCharset : ' .')
-      : CHAR_SETS[charsetKey];
-    return invert ? base.split('').reverse().join('') : base;
-  }, [charsetKey, customCharset, invert]);
+  useEffect(() => {
+    const visited = localStorage.getItem('ascii-studio-visited');
+    if (!visited) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsFirstVisit(true);
+      localStorage.setItem('ascii-studio-visited', '1');
+      const t = setTimeout(() => setIsFirstVisit(false), 3000);
+      return () => clearTimeout(t);
+    }
+  }, []);
+
+  const charset = useMemo(() => CHAR_SETS[charsetKey], [charsetKey]);
+
+  const handleColsChange = (newCols) => {
+    setCols(newCols);
+    if (ratioLocked) {
+      const derived = Math.max(20, Math.min(120, Math.round(newCols * lockedRatio)));
+      setRows(derived);
+    }
+  };
+
+  const handleRowsChange = (newRows) => {
+    setRows(newRows);
+    if (ratioLocked) {
+      const derived = Math.max(20, Math.min(160, Math.round(newRows / lockedRatio)));
+      setCols(derived);
+    }
+  };
+
+  const handleToggleLock = () => {
+    if (!ratioLocked) {
+      setLockedRatio(rows / cols);
+    }
+    setRatioLocked(!ratioLocked);
+  };
+
+  const handleModeChange = (newMode) => {
+    setMode(newMode);
+    const newCols = getDefaultCols(newMode);
+    const newRows = 30;
+    setCols(newCols);
+    setRows(newRows);
+    setLockedRatio(newRows / newCols);
+  };
 
   const generateFromText = useCallback(() => {
     if (!text) { setAscii(''); return; }
@@ -73,8 +128,8 @@ export default function App() {
       ctx.fillStyle = 'black';
       ctx.fillText(text, w / 2, h / 2);
     }
-    setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows)));
-  }, [text, textStyle, cols, rows, charset]);
+    setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, invert, isolateSubject, subjectThreshold, enhanceContrast)));
+  }, [text, textStyle, cols, rows, charset, invert, isolateSubject, subjectThreshold, enhanceContrast]);
 
   const generateFromImage = useCallback(() => {
     if (!imageUrl) { setAscii(''); return; }
@@ -95,10 +150,10 @@ export default function App() {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, iw, ih);
       ctx.drawImage(img, 0, 0, iw, ih);
-      setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows)));
+      setAscii(trimAscii(canvasToAscii(canvas, cols, charset, rows, invert, isolateSubject, subjectThreshold, enhanceContrast)));
     };
     img.src = imageUrl;
-  }, [imageUrl, cols, rows, charset]);
+  }, [imageUrl, cols, rows, charset, invert, isolateSubject, subjectThreshold, enhanceContrast]);
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -117,7 +172,7 @@ export default function App() {
       style={{
         background: THEME.INK,
         color: THEME.TYPE,
-        fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+        fontFamily: UI_STACK,
         minHeight: '100vh',
       }}
       className="w-full"
@@ -141,6 +196,7 @@ export default function App() {
         <TopStatusBar
           theme={THEME}
           isAnimating={isAnimating}
+          isFirstVisit={isFirstVisit}
           charsetKey={charsetKey}
           cols={cols}
           rows={rows}
@@ -152,16 +208,19 @@ export default function App() {
         >
           <Controls
             theme={THEME}
-            mode={mode} setMode={setMode}
+            mode={mode} setMode={handleModeChange}
             text={text} setText={setText}
             textStyle={textStyle} setTextStyle={setTextStyle}
             imageUrl={imageUrl} setImageUrl={setImageUrl}
             imageName={imageName} setImageName={setImageName}
-            cols={cols} setCols={setCols}
-            rows={rows} setRows={setRows}
+            cols={cols} setCols={handleColsChange}
+            rows={rows} setRows={handleRowsChange}
+            ratioLocked={ratioLocked} onToggleLock={handleToggleLock}
             charsetKey={charsetKey} setCharsetKey={setCharsetKey}
-            customCharset={customCharset} setCustomCharset={setCustomCharset}
             invert={invert} setInvert={setInvert}
+            enhanceContrast={enhanceContrast} setEnhanceContrast={setEnhanceContrast}
+            isolateSubject={isolateSubject} setIsolateSubject={setIsolateSubject}
+            subjectThreshold={subjectThreshold} setSubjectThreshold={setSubjectThreshold}
             foreground={foreground} setForeground={setForeground}
             background={background} setBackground={setBackground}
           />
@@ -188,6 +247,10 @@ export default function App() {
         @keyframes blink {
           0%, 50% { opacity: 1; }
           51%, 100% { opacity: 0; }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
         }
       `}</style>
     </div>

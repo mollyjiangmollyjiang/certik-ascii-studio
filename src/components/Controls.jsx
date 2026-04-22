@@ -1,11 +1,12 @@
 import { useRef, useState } from 'react';
-import { Type, ImageIcon, Upload, Check, X } from 'lucide-react';
+import { Type, ImageIcon, Upload, Check, X, Link2, Unlink } from 'lucide-react';
 import { CHAR_SETS, TEXT_STYLES } from '../lib/engine';
+import { MONO_STACK } from '../lib/fonts';
 
-const CHARSET_KEYS = [
-  'GRADIENT', 'BLOCKS', 'DOTS',
-  'BINARY',   'DETAILED', 'CUSTOM',
-  'FORMAL',   'AUDIT',    'THEOREM',
+const PRIMARY_CHARSETS = ['MATH', 'BLOCKS', 'DOTS'];
+const SECONDARY_CHARSETS = [
+  'GRADIENT', 'DETAILED', 'HALF-BLOCK',
+  'BINARY',   'AUDIT',    'THEOREM',
 ];
 
 export default function Controls({
@@ -17,15 +18,19 @@ export default function Controls({
   imageName, setImageName,
   cols, setCols,
   rows, setRows,
+  ratioLocked, onToggleLock,
   charsetKey, setCharsetKey,
-  customCharset, setCustomCharset,
   invert, setInvert,
+  enhanceContrast, setEnhanceContrast,
+  isolateSubject, setIsolateSubject,
+  subjectThreshold, setSubjectThreshold,
   foreground, setForeground,
   background, setBackground,
 }) {
   const { INK, DEEP, HAIR, TYPE, MUTED, BLUE } = theme;
   const fileInputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
+  const [showAllCharsets, setShowAllCharsets] = useState(false);
 
   const handleFile = (file) => {
     if (!file || !file.type.startsWith('image/')) return;
@@ -45,13 +50,13 @@ export default function Controls({
     <aside className="p-5 md:p-6 md:h-full md:overflow-y-auto" style={{ borderRight: `1px solid ${HAIR}`, background: DEEP }}>
       <Section label="01 // MODE" muted={MUTED}>
         <div className="grid grid-cols-2 gap-0" style={{ border: `1px solid ${HAIR}` }}>
-          <Toggle active={mode === 'text'} onClick={() => setMode('text')} ink={INK} type={TYPE} hair={HAIR}>
-            <Type size={12} strokeWidth={2.5} />
-            <span>TEXT</span>
-          </Toggle>
-          <Toggle active={mode === 'image'} onClick={() => setMode('image')} ink={INK} type={TYPE} hair={HAIR} borderLeft>
+          <Toggle active={mode === 'image'} onClick={() => setMode('image')} ink={INK} type={TYPE} hair={HAIR}>
             <ImageIcon size={12} strokeWidth={2.5} />
             <span>IMAGE</span>
+          </Toggle>
+          <Toggle active={mode === 'text'} onClick={() => setMode('text')} ink={INK} type={TYPE} hair={HAIR} borderLeft>
+            <Type size={12} strokeWidth={2.5} />
+            <span>TEXT</span>
           </Toggle>
         </div>
       </Section>
@@ -65,17 +70,17 @@ export default function Controls({
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 maxLength={24}
-                placeholder="your text"
+                placeholder="type something_"
                 style={{
                   background: INK, border: `1px solid ${HAIR}`, color: TYPE,
-                  fontFamily: 'inherit', letterSpacing: '0.06em',
+                  fontFamily: MONO_STACK, letterSpacing: '0.06em',
                 }}
-                className="w-full pl-8 pr-3 py-2.5 text-sm font-semibold uppercase outline-none focus:border-white/30"
+                className="w-full pl-8 pr-3 py-2.5 text-sm font-semibold outline-none focus:border-white/30"
               />
             </div>
             <div className="mt-3">
               <div className="text-[10px] tracking-[0.2em] mb-2" style={{ color: MUTED }}>STYLE</div>
-              <div className="grid grid-cols-4 gap-0" style={{ border: `1px solid ${HAIR}` }}>
+              <div className="grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
                 {TEXT_STYLES.map((s, i) => (
                   <button
                     key={s.key}
@@ -117,7 +122,7 @@ export default function Controls({
                 <img src={imageUrl} alt="" className="w-10 h-10 object-contain" style={{ border: `1px solid ${HAIR}`, background: '#fff' }} />
                 <div className="flex-1 text-left overflow-hidden">
                   <div className="text-[11px] font-semibold truncate">{imageName}</div>
-                  <div className="text-[10px] tracking-[0.15em]" style={{ color: MUTED }}>TAP TO REPLACE</div>
+                  <div className="text-[10px] tracking-[0.15em]" style={{ color: MUTED }}>tap to replace</div>
                 </div>
                 <button
                   onClick={(e) => { e.stopPropagation(); setImageUrl(null); setImageName(''); }}
@@ -130,8 +135,8 @@ export default function Controls({
             ) : (
               <>
                 <Upload size={18} className="mx-auto mb-3" strokeWidth={1.8} style={{ color: MUTED }} />
-                <div className="text-[11px] tracking-[0.2em] font-semibold">DROP IMAGE</div>
-                <div className="text-[10px] mt-1 tracking-[0.15em]" style={{ color: MUTED }}>OR CLICK TO BROWSE</div>
+                <div className="text-[11px] tracking-[0.2em] font-semibold">drop anything here</div>
+                <div className="text-[10px] mt-1 tracking-[0.15em]" style={{ color: MUTED }}>or click to browse</div>
               </>
             )}
           </div>
@@ -140,36 +145,60 @@ export default function Controls({
 
       <Section label="03 // CHARSET" muted={MUTED}>
         <div className="grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
-          {CHARSET_KEYS.map((k, i) => (
-            <button
+          {PRIMARY_CHARSETS.map((k, i) => (
+            <CharsetButton
               key={k}
+              name={k}
+              selected={charsetKey === k}
               onClick={() => setCharsetKey(k)}
-              style={{
-                background: charsetKey === k ? TYPE : 'transparent',
-                color: charsetKey === k ? INK : TYPE,
-                borderRight: (i + 1) % 3 !== 0 ? `1px solid ${HAIR}` : 'none',
-                borderTop: i >= 3 ? `1px solid ${HAIR}` : 'none',
-              }}
-              className="px-1.5 py-2 text-[9.5px] tracking-[0.1em] font-semibold hover:bg-white/5"
-            >
-              {k}
-            </button>
+              ink={INK} type={TYPE} hair={HAIR}
+              borderRight={i < PRIMARY_CHARSETS.length - 1}
+              borderTop={false}
+            />
           ))}
         </div>
-        {charsetKey === 'CUSTOM' && (
-          <input
-            value={customCharset}
-            onChange={(e) => setCustomCharset(e.target.value)}
-            placeholder="dense → sparse"
-            style={{ background: INK, border: `1px solid ${HAIR}`, color: TYPE }}
-            className="w-full mt-2 px-3 py-2 text-sm outline-none"
-          />
-        )}
+
+        <button
+          onClick={() => setShowAllCharsets(!showAllCharsets)}
+          className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 text-[10px] tracking-[0.15em] font-medium hover:bg-white/5 transition-colors cursor-pointer"
+          style={{
+            background: INK,
+            border: `1px solid ${HAIR}`,
+            color: TYPE,
+          }}
+        >
+          <span style={{ color: BLUE }}>{showAllCharsets ? '▾' : '▸'}</span>
+          <span>{showAllCharsets ? 'fewer charsets' : 'more charsets'}</span>
+        </button>
+
+        <div
+          style={{
+            maxHeight: showAllCharsets ? '240px' : '0',
+            opacity: showAllCharsets ? 1 : 0,
+            overflow: 'hidden',
+            transition: 'max-height 250ms ease, opacity 200ms ease',
+          }}
+        >
+          <div className="mt-2 grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
+            {SECONDARY_CHARSETS.map((k, i) => (
+              <CharsetButton
+                key={k}
+                name={k}
+                selected={charsetKey === k}
+                onClick={() => setCharsetKey(k)}
+                ink={INK} type={TYPE} hair={HAIR}
+                borderRight={(i + 1) % 3 !== 0}
+                borderTop={i >= 3}
+              />
+            ))}
+          </div>
+        </div>
+
         <div
           className="mt-2 px-3 py-2 text-[13px] overflow-hidden whitespace-nowrap"
-          style={{ background: INK, border: `1px solid ${HAIR}`, color: MUTED, letterSpacing: '0.12em' }}
+          style={{ background: INK, border: `1px solid ${HAIR}`, color: MUTED, letterSpacing: '0.12em', fontFamily: MONO_STACK }}
         >
-          {(charsetKey === 'CUSTOM' ? customCharset : CHAR_SETS[charsetKey]) || '—'}
+          {CHAR_SETS[charsetKey] || '—'}
         </div>
       </Section>
 
@@ -180,7 +209,22 @@ export default function Controls({
         </div>
       </Section>
 
-      <Section label="05 // GRID" muted={MUTED}>
+      <Section
+        label={`05 // GRID · ${cols}×${rows}`}
+        muted={MUTED}
+        right={
+          <button
+            onClick={onToggleLock}
+            style={{ color: ratioLocked ? TYPE : MUTED }}
+            className="flex items-center gap-1.5 text-[9px] tracking-[0.18em] hover:opacity-80 transition-opacity"
+          >
+            {ratioLocked
+              ? <Link2 size={14} strokeWidth={2} />
+              : <Unlink size={14} strokeWidth={2} />}
+            <span>{ratioLocked ? 'locked' : 'unlocked'}</span>
+          </button>
+        }
+      >
         <div className="flex items-center justify-between text-[10px] tracking-[0.18em]" style={{ color: MUTED }}>
           <span>COLS</span><span style={{ color: TYPE }}>{cols}</span>
         </div>
@@ -208,6 +252,22 @@ export default function Controls({
       </Section>
 
       <Section label="06 // OPTIONS" muted={MUTED}>
+        {mode === 'image' && (
+          <label className="flex items-center gap-3 cursor-pointer select-none mb-3">
+            <div
+              style={{
+                width: 16, height: 16,
+                border: `1px solid ${enhanceContrast ? BLUE : HAIR}`,
+                background: enhanceContrast ? BLUE : 'transparent',
+                display: 'grid', placeItems: 'center',
+              }}
+            >
+              {enhanceContrast && <Check size={10} color={TYPE} strokeWidth={3} />}
+            </div>
+            <input type="checkbox" checked={enhanceContrast} onChange={(e) => setEnhanceContrast(e.target.checked)} className="hidden" />
+            <span className="text-[11px] tracking-[0.12em] font-medium">enhance contrast</span>
+          </label>
+        )}
         <label className="flex items-center gap-3 cursor-pointer select-none">
           <div
             style={{
@@ -220,20 +280,81 @@ export default function Controls({
             {invert && <Check size={10} color={TYPE} strokeWidth={3} />}
           </div>
           <input type="checkbox" checked={invert} onChange={(e) => setInvert(e.target.checked)} className="hidden" />
-          <span className="text-[11px] tracking-[0.12em] font-medium">INVERT TONAL MAPPING</span>
+          <span className="text-[11px] tracking-[0.12em] font-medium">flip the lights</span>
         </label>
+
+        {mode === 'image' && (
+          <>
+            <label className="flex items-center gap-3 cursor-pointer select-none mt-3">
+              <div
+                style={{
+                  width: 16, height: 16,
+                  border: `1px solid ${isolateSubject ? BLUE : HAIR}`,
+                  background: isolateSubject ? BLUE : 'transparent',
+                  display: 'grid', placeItems: 'center',
+                }}
+              >
+                {isolateSubject && <Check size={10} color={TYPE} strokeWidth={3} />}
+              </div>
+              <input type="checkbox" checked={isolateSubject} onChange={(e) => setIsolateSubject(e.target.checked)} className="hidden" />
+              <span className="text-[11px] tracking-[0.12em] font-medium">isolate subject</span>
+            </label>
+
+            {isolateSubject && (
+              <div className="mt-3">
+                <div className="flex items-center justify-between text-[10px] tracking-[0.18em] mb-1" style={{ color: MUTED }}>
+                  <span>subject threshold</span>
+                  <span style={{ color: TYPE }}>{subjectThreshold.toFixed(2)}</span>
+                </div>
+                <input
+                  type="range"
+                  min={0.3}
+                  max={0.95}
+                  step={0.01}
+                  value={subjectThreshold}
+                  onChange={(e) => setSubjectThreshold(+e.target.value)}
+                  className="w-full"
+                  style={{ accentColor: BLUE }}
+                />
+                <div className="flex justify-between text-[9px] mt-0.5 tracking-[0.15em]" style={{ color: MUTED }}>
+                  <span>keep more</span><span>keep less</span>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </Section>
 
     </aside>
   );
 }
 
-function Section({ label, children, muted }) {
+function Section({ label, children, muted, right }) {
   return (
     <div className="mb-5">
-      <div className="text-[10px] tracking-[0.22em] mb-2.5 font-semibold" style={{ color: muted }}>{label}</div>
+      <div className="flex items-center justify-between mb-2.5">
+        <div className="text-[10px] tracking-[0.22em] font-semibold" style={{ color: muted }}>{label}</div>
+        {right}
+      </div>
       {children}
     </div>
+  );
+}
+
+function CharsetButton({ name, selected, onClick, ink, type, hair, borderRight, borderTop }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: selected ? type : 'transparent',
+        color: selected ? ink : type,
+        borderRight: borderRight ? `1px solid ${hair}` : 'none',
+        borderTop: borderTop ? `1px solid ${hair}` : 'none',
+      }}
+      className="px-1.5 py-2 text-[9.5px] tracking-[0.1em] font-semibold hover:bg-white/5"
+    >
+      {name}
+    </button>
   );
 }
 
