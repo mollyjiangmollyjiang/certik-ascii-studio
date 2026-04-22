@@ -3,10 +3,10 @@ import { Type, ImageIcon, Upload, Check, X, Link2, Unlink } from 'lucide-react';
 import { CHAR_SETS, TEXT_STYLES } from '../lib/engine';
 import { MONO_STACK } from '../lib/fonts';
 
-const CHARSET_KEYS = [
-  'GRADIENT', 'BLOCKS',   'HALF-BLOCK',
-  'DOTS',     'BINARY',   'DETAILED',
-  'FORMAL',   'AUDIT',    'THEOREM',
+const PRIMARY_CHARSETS = ['MATH', 'BLOCKS', 'DOTS'];
+const SECONDARY_CHARSETS = [
+  'GRADIENT', 'DETAILED', 'HALF-BLOCK',
+  'BINARY',   'AUDIT',    'THEOREM',
 ];
 
 export default function Controls({
@@ -30,6 +30,7 @@ export default function Controls({
   const { INK, DEEP, HAIR, TYPE, MUTED, BLUE } = theme;
   const fileInputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
+  const [showAllCharsets, setShowAllCharsets] = useState(false);
 
   const handleFile = (file) => {
     if (!file || !file.type.startsWith('image/')) return;
@@ -144,22 +145,50 @@ export default function Controls({
 
       <Section label="03 // CHARSET" muted={MUTED}>
         <div className="grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
-          {CHARSET_KEYS.map((k, i) => (
-            <button
+          {PRIMARY_CHARSETS.map((k, i) => (
+            <CharsetButton
               key={k}
+              name={k}
+              selected={charsetKey === k}
               onClick={() => setCharsetKey(k)}
-              style={{
-                background: charsetKey === k ? TYPE : 'transparent',
-                color: charsetKey === k ? INK : TYPE,
-                borderRight: (i + 1) % 3 !== 0 ? `1px solid ${HAIR}` : 'none',
-                borderTop: i >= 3 ? `1px solid ${HAIR}` : 'none',
-              }}
-              className="px-1.5 py-2 text-[9.5px] tracking-[0.1em] font-semibold hover:bg-white/5"
-            >
-              {k}
-            </button>
+              ink={INK} type={TYPE} hair={HAIR}
+              borderRight={i < PRIMARY_CHARSETS.length - 1}
+              borderTop={false}
+            />
           ))}
         </div>
+
+        <button
+          onClick={() => setShowAllCharsets(!showAllCharsets)}
+          className="mt-1.5 text-[11px] hover:underline cursor-pointer"
+          style={{ color: MUTED, background: 'transparent', border: 'none', padding: 0 }}
+        >
+          {showAllCharsets ? 'fewer charsets ˅' : 'more charsets ›'}
+        </button>
+
+        <div
+          style={{
+            maxHeight: showAllCharsets ? '240px' : '0',
+            opacity: showAllCharsets ? 1 : 0,
+            overflow: 'hidden',
+            transition: 'max-height 250ms ease, opacity 200ms ease',
+          }}
+        >
+          <div className="mt-2 grid grid-cols-3 gap-0" style={{ border: `1px solid ${HAIR}` }}>
+            {SECONDARY_CHARSETS.map((k, i) => (
+              <CharsetButton
+                key={k}
+                name={k}
+                selected={charsetKey === k}
+                onClick={() => setCharsetKey(k)}
+                ink={INK} type={TYPE} hair={HAIR}
+                borderRight={(i + 1) % 3 !== 0}
+                borderTop={i >= 3}
+              />
+            ))}
+          </div>
+        </div>
+
         <div
           className="mt-2 px-3 py-2 text-[13px] overflow-hidden whitespace-nowrap"
           style={{ background: INK, border: `1px solid ${HAIR}`, color: MUTED, letterSpacing: '0.12em', fontFamily: MONO_STACK }}
@@ -304,6 +333,23 @@ function Section({ label, children, muted, right }) {
       </div>
       {children}
     </div>
+  );
+}
+
+function CharsetButton({ name, selected, onClick, ink, type, hair, borderRight, borderTop }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        background: selected ? type : 'transparent',
+        color: selected ? ink : type,
+        borderRight: borderRight ? `1px solid ${hair}` : 'none',
+        borderTop: borderTop ? `1px solid ${hair}` : 'none',
+      }}
+      className="px-1.5 py-2 text-[9.5px] tracking-[0.1em] font-semibold hover:bg-white/5"
+    >
+      {name}
+    </button>
   );
 }
 

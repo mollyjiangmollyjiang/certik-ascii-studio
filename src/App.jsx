@@ -29,7 +29,7 @@ export default function App() {
   const [rows, setRows] = useState(30);
   const [ratioLocked, setRatioLocked] = useState(true);
   const [lockedRatio, setLockedRatio] = useState(30 / 72);
-  const [charsetKey, setCharsetKey] = useState('BLOCKS');
+  const [charsetKey, setCharsetKey] = useState('MATH');
   const [invert, setInvert] = useState(false);
   const [enhanceContrast, setEnhanceContrast] = useState(true);
   const [isolateSubject, setIsolateSubject] = useState(false);
