@@ -1,4 +1,5 @@
 import { useClock } from '../lib/clock';
+import { MONO_STACK } from '../lib/fonts';
 
 export function TopStatusBar({ theme, isAnimating, isFirstVisit, charsetKey, cols, rows }) {
   const { DEEP, HAIR, TYPE, MUTED, BLUE } = theme;
@@ -8,7 +9,7 @@ export function TopStatusBar({ theme, isAnimating, isFirstVisit, charsetKey, col
   return (
     <div
       className="flex items-center justify-between text-[10px] tracking-[0.22em] mb-4 px-4 py-2.5"
-      style={{ background: DEEP, border: `1px solid ${HAIR}`, color: MUTED }}
+      style={{ background: DEEP, border: `1px solid ${HAIR}`, color: MUTED, fontFamily: MONO_STACK }}
     >
       <div className="flex items-center gap-3 flex-wrap">
         <span style={{ color: BLUE }}>◆</span>
@@ -56,7 +57,7 @@ export function BottomStatusBar({ theme }) {
   return (
     <div
       className="mt-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-2 text-[10px] tracking-[0.22em] px-4 py-2.5"
-      style={{ background: DEEP, border: `1px solid ${HAIR}`, color: MUTED }}
+      style={{ background: DEEP, border: `1px solid ${HAIR}`, color: MUTED, fontFamily: MONO_STACK }}
     >
       <div className="flex gap-3">
         <span>ENGINE:</span>

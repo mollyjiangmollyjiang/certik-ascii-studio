@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { Type, ImageIcon, Upload, Check, X, Link2, Unlink } from 'lucide-react';
 import { CHAR_SETS, TEXT_STYLES } from '../lib/engine';
+import { MONO_STACK } from '../lib/fonts';
 
 const CHARSET_KEYS = [
   'GRADIENT', 'BLOCKS',   'HALF-BLOCK',
@@ -71,7 +72,7 @@ export default function Controls({
                 placeholder="type something_"
                 style={{
                   background: INK, border: `1px solid ${HAIR}`, color: TYPE,
-                  fontFamily: 'inherit', letterSpacing: '0.06em',
+                  fontFamily: MONO_STACK, letterSpacing: '0.06em',
                 }}
                 className="w-full pl-8 pr-3 py-2.5 text-sm font-semibold outline-none focus:border-white/30"
               />
@@ -161,7 +162,7 @@ export default function Controls({
         </div>
         <div
           className="mt-2 px-3 py-2 text-[13px] overflow-hidden whitespace-nowrap"
-          style={{ background: INK, border: `1px solid ${HAIR}`, color: MUTED, letterSpacing: '0.12em' }}
+          style={{ background: INK, border: `1px solid ${HAIR}`, color: MUTED, letterSpacing: '0.12em', fontFamily: MONO_STACK }}
         >
           {CHAR_SETS[charsetKey] || '—'}
         </div>

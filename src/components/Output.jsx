@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Copy, Download, Check, Code } from 'lucide-react';
-
-const MONO_STACK = '"JetBrains Mono", "Cascadia Code", "Fira Code", "SF Mono", "Menlo", "Consolas", "DejaVu Sans Mono", "Noto Sans Mono", monospace';
+import { MONO_STACK } from '../lib/fonts';
 
 export default function Output({
   theme,
@@ -14,7 +13,9 @@ export default function Output({
   background,
 }) {
   const { INK, DEEP, HAIR, TYPE, MUTED, BLUE } = theme;
-  const [copied, setCopied] = useState(false);
+  const [copyStatus, setCopyStatus] = useState('idle');
+  const [svgStatus, setSvgStatus] = useState('idle');
+  const [pngStatus, setPngStatus] = useState('idle');
 
   const lineCount = ascii ? ascii.split('\n').length : 0;
   const colCount  = ascii ? Math.max(...ascii.split('\n').map(l => l.length)) : 0;
@@ -22,8 +23,8 @@ export default function Output({
 
   const handleCopy = () => {
     navigator.clipboard.writeText(ascii);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1200);
+    setCopyStatus('success');
+    setTimeout(() => setCopyStatus('idle'), 1500);
   };
 
   const handleDownloadSvg = () => {
@@ -67,6 +68,9 @@ export default function Output({
     a.download = `${filename}.svg`;
     a.click();
     URL.revokeObjectURL(url);
+
+    setSvgStatus('success');
+    setTimeout(() => setSvgStatus('idle'), 1500);
   };
 
   const handleDownloadPng = () => {
@@ -94,6 +98,9 @@ export default function Output({
     a.href = canvas.toDataURL('image/png');
     a.download = `${filename}.png`;
     a.click();
+
+    setPngStatus('success');
+    setTimeout(() => setPngStatus('idle'), 1500);
   };
 
   return (
@@ -102,7 +109,10 @@ export default function Output({
         className="flex items-center justify-between gap-4 px-5 py-3"
         style={{ borderBottom: `1px solid ${HAIR}`, background: DEEP }}
       >
-        <div className="flex items-center gap-4 text-[10px] tracking-[0.18em] flex-wrap" style={{ color: MUTED }}>
+        <div
+          className="flex items-center gap-4 text-[10px] tracking-[0.18em] flex-wrap"
+          style={{ color: MUTED, fontFamily: MONO_STACK }}
+        >
           <span className="font-semibold" style={{ color: TYPE }}>OUTPUT</span>
           <span>//</span>
           <span>{colCount}×{lineCount} grid</span>
@@ -112,17 +122,45 @@ export default function Output({
         </div>
 
         <div className="flex items-stretch flex-shrink-0" style={{ border: `1px solid ${HAIR}` }}>
-          <ExportButton onClick={handleCopy} disabled={!ascii} type={TYPE} hair={HAIR}>
-            {copied ? <Check size={11} strokeWidth={2.5} /> : <Copy size={11} strokeWidth={2.5} />}
-            <span>{copied ? 'COPIED' : 'COPY'}</span>
+          <ExportButton
+            onClick={handleCopy}
+            disabled={!ascii}
+            success={copyStatus === 'success'}
+            type={TYPE}
+            hair={HAIR}
+          >
+            {copyStatus === 'success'
+              ? <Check size={11} strokeWidth={2.5} />
+              : <Copy size={11} strokeWidth={2.5} />}
+            <span>{copyStatus === 'success' ? 'copied ✓' : 'COPY'}</span>
           </ExportButton>
-          <ExportButton onClick={handleDownloadSvg} disabled={!ascii} type={TYPE} hair={HAIR} borderLeft>
-            <Code size={11} strokeWidth={2.5} />
-            <span>.SVG</span>
+          <ExportButton
+            onClick={handleDownloadSvg}
+            disabled={!ascii}
+            success={svgStatus === 'success'}
+            type={TYPE}
+            hair={HAIR}
+            borderLeft
+          >
+            {svgStatus === 'success'
+              ? <Check size={11} strokeWidth={2.5} />
+              : <Code size={11} strokeWidth={2.5} />}
+            <span>{svgStatus === 'success' ? '✓' : '.SVG'}</span>
           </ExportButton>
-          <ExportButton onClick={handleDownloadPng} disabled={!ascii} type={TYPE} hair={HAIR} borderLeft primary blue={BLUE}>
-            <Download size={11} strokeWidth={2.5} />
-            <span>.PNG</span>
+          <ExportButton
+            onClick={handleDownloadPng}
+            disabled={!ascii}
+            success={pngStatus === 'success'}
+            type={TYPE}
+            hair={HAIR}
+            borderLeft
+            primary
+            blue={BLUE}
+          >
+            {pngStatus === 'success'
+              ? <Check size={11} strokeWidth={2.5} />
+              : <Download size={11} strokeWidth={2.5} />}
+            <span>{pngStatus === 'success' ? '✓' : '.PNG'}</span>
           </ExportButton>
         </div>
       </div>
@@ -151,7 +189,10 @@ export default function Output({
             {displayed}
           </pre>
         ) : (
-          <div className="h-full grid place-items-center text-center" style={{ color: MUTED }}>
+          <div
+            className="h-full grid place-items-center text-center"
+            style={{ color: MUTED, fontFamily: MONO_STACK }}
+          >
             <div>
               <div className="text-[10px] tracking-[0.22em] mb-2">NO SIGNAL</div>
               <div className="text-[11px] tracking-[0.12em]">
@@ -166,19 +207,20 @@ export default function Output({
   );
 }
 
-function ExportButton({ onClick, disabled, children, type, hair, borderLeft, primary, blue }) {
+function ExportButton({ onClick, disabled, success, children, type, hair, borderLeft, primary, blue }) {
+  const blocked = disabled || success;
   return (
     <button
       onClick={onClick}
-      disabled={disabled}
+      disabled={blocked}
       style={{
-        background: primary ? (disabled ? '#1F2937' : blue) : 'transparent',
+        background: primary ? (disabled && !success ? '#1F2937' : blue) : 'transparent',
         color: primary ? '#fff' : type,
         borderLeft: borderLeft ? `1px solid ${hair}` : 'none',
-        opacity: disabled && !primary ? 0.35 : 1,
-        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: success ? 0.6 : (disabled && !primary ? 0.35 : 1),
+        cursor: success ? 'default' : (disabled ? 'not-allowed' : 'pointer'),
       }}
-      className={`flex items-center justify-center gap-1.5 px-3 py-1.5 text-[10px] tracking-[0.16em] font-semibold transition-all ${primary && !disabled ? 'hover:brightness-110' : 'hover:bg-white/5'}`}
+      className={`flex items-center justify-center gap-1.5 px-3 py-1.5 text-[10px] tracking-[0.16em] font-semibold transition-all ${primary && !blocked ? 'hover:brightness-110' : !blocked ? 'hover:bg-white/5' : ''}`}
     >
       {children}
     </button>

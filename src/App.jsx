@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CHAR_SETS, TEXT_STYLES, canvasToAscii, trimAscii } from './lib/engine';
 import { useScramble } from './lib/scramble';
+import { UI_STACK } from './lib/fonts';
 import Controls from './components/Controls';
 import Output from './components/Output';
 import { TopStatusBar, BottomStatusBar } from './components/StatusBar';
@@ -38,7 +39,7 @@ export default function App() {
 
   useEffect(() => {
     const google = document.createElement('link');
-    google.href = 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&family=Playfair+Display:ital,wght@0,900;1,900&display=swap';
+    google.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&family=Playfair+Display:ital,wght@0,900;1,900&display=swap';
     google.rel = 'stylesheet';
     document.head.appendChild(google);
 
@@ -160,7 +161,7 @@ export default function App() {
       style={{
         background: THEME.INK,
         color: THEME.TYPE,
-        fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+        fontFamily: UI_STACK,
         minHeight: '100vh',
       }}
       className="w-full"
